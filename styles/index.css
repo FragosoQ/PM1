@@ -52,11 +52,22 @@ canvas {
   top: 16px;
   left: 16px;
 	/* 80% smaller than original 16vw */
-	width: 3.2vw;
+	width: 5.2vw;
   height: auto;
   z-index: 1000;
   background: transparent;
   cursor: pointer;
+}
+
+/* Top right logo styling */
+.top-right-logo {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  width: 5.2vw;
+  height: auto;
+  z-index: 1000;
+  background: transparent;
 }
 
 /* Hide dat.GUI header / 'Open controls' label (keeps the panel usable) */
@@ -65,3 +76,32 @@ canvas {
 .dg .title {
 	display: none !important;
 }
+
+/* Grid container */
+.grid-container {
+	position: fixed;
+	top: 100px;
+	right: 200px;
+	display: grid;
+	grid-template-columns: repeat(2, 150px);
+	grid-template-rows: repeat(2, 150px) 150px;
+	gap: 20px;
+	z-index: 1000;
+}
+
+.grid-item {
+	background-color: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-size: 14px;
+}
+
+.grid-item-wide {
+	grid-column: 1 / 3;
+}
+
+
