@@ -1,0 +1,67 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');
+
+body,
+html {
+	margin: 0;
+	padding: 0;
+	font-family: 'Open Sans', sans-serif;
+	background-color: black;
+}
+
+canvas {
+  vertical-align: top;
+}
+
+.dg.a {
+	margin-top: 10px;
+	min-width: 300px;
+}
+
+.app-wrapper {
+	position: fixed;
+	left: 0;
+	top: 0;
+}
+
+.markers {
+	position: relative;
+	padding: 0;
+	list-style-type: none;
+}
+
+.marker {
+	color: white;
+	font-weight: 300;
+	font-size: 14px;
+}
+
+.marker:before {
+	content: '';
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	background: white;
+	position: absolute;
+	left: 50%;
+	top: -50%;
+}
+
+/* Top left logo styling */
+.top-left-logo {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+	/* 30% smaller than original 16vw */
+	width: 11.2vw;
+  height: auto;
+  z-index: 1000;
+  background: transparent;
+  cursor: pointer;
+}
+
+/* Hide dat.GUI header / 'Open controls' label (keeps the panel usable) */
+.dg .close-button,
+.dg .close,
+.dg .title {
+	display: none !important;
+}
