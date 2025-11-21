@@ -24,7 +24,8 @@ class Markers {
         const lng = +country.longitude;
 
         const cords = toSphereCoordinates(lat, lng, this.radius);
-        const marker = new Marker(this.markerMaterial, this.markerGeometry, country.name, cords);
+        // Pass the country name to the Marker constructor
+        const marker = new Marker(this.markerMaterial, this.markerGeometry, country.name, cords, { countryName: country.name });
         elements.markers.push(marker);
       }
     }

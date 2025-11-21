@@ -2,12 +2,14 @@ class Marker {
   constructor(material, geometry, label, cords, {
     textColor = 'white',
     pointColor = config.colors.globeMarkerColor,
-    glowColor = config.colors.globeMarkerGlow
+    glowColor = config.colors.globeMarkerGlow,
+    countryName = ''
   } = {}) {
     this.material = material;
     this.geometry = geometry;
     this.labelText = label;
     this.cords = cords;
+    this.countryName = countryName;
 
     this.isAnimating = false;
 
@@ -54,14 +56,16 @@ class Marker {
   }
 
   createGlow() {
-    this.glow = new THREE.Mesh( this.geometry, this.material.clone() );
-    this.glow.material.color.set(this.glowColor);
-    this.glow.material.opacity = 0.6;
-    this.group.add(this.glow);
-    elements.markerPoint.push(this.glow);
+    // Ripple effects disabled for all markers
+    this.glow = null;
   }
 
   animateGlow() {
+    // Only animate glow for Portugal and Nigeria (and only if glow exists)
+    if(!this.glow) {
+      return;
+    }
+
     if(!this.isAnimating) {
       if(Math.random() > 0.99) {
         this.isAnimating = true;

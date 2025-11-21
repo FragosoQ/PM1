@@ -287,9 +287,12 @@ function animate(app) {
     for(let i = 0; i < elements.markers.length; i++) {
       const marker = elements.markers[i];
       marker.point.material.color.set(config.colors.globeMarkerColor);
-      marker.glow.material.color.set(config.colors.globeMarkerGlow);
+      if(marker.glow) {
+        marker.glow.material.color.set(config.colors.globeMarkerGlow);
+      }
       marker.label.material.map.needsUpdate = true;
-      marker.animateGlow();
+      // Ripple animation disabled
+      // marker.animateGlow();
     }
   }
 
