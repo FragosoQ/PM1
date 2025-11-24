@@ -53,6 +53,7 @@ class Marker {
     this.label.scale.set( 40, 20, 1 );
     this.label.center.x = 0.25;
     this.label.translateY(2);
+    this.label.renderOrder = 999;
 
     this.group.add(this.label);
     elements.markerLabel.push(this.label);
