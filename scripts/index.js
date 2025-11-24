@@ -317,20 +317,20 @@ async function setup(app) {
 }
 
 /**
- * Configura rotação de 360 graus a cada 10 segundos
+ * Configura rotação de 360 graus a cada 25 segundos
  */
 function setupPeriodicRotation() {
-  const ROTATION_INTERVAL = 10 * 1000; // 10 segundos em milissegundos
+  const ROTATION_INTERVAL = 25 * 1000; // 25 segundos em milissegundos
   const ROTATION_DURATION = 5000; // 5 segundos para completar a volta
   
   let isRotating = false;
   let rotationStartTime = 0;
   let initialRotationY = 0;
   
-  // Inicia a primeira rotação após 10 segundos
+  // Inicia a primeira rotação após 25 segundos
   setTimeout(() => {
     startFullRotation();
-    // Depois repete a cada 10 segundos
+    // Depois repete a cada 25 segundos
     setInterval(startFullRotation, ROTATION_INTERVAL);
   }, ROTATION_INTERVAL);
   
