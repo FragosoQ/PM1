@@ -187,13 +187,14 @@ canvas {
 }
 
 .info-panel-content-1 .info-line {
-	font-size: 11vw;
+	font-size: 152px;
 	font-weight: bold;
 	max-width: 100%;
+	max-height: 95%;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	line-height: 1;
+	line-height: 0.95;
 }
 
 .info-panel-card-2 {
