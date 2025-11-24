@@ -1,10 +1,10 @@
 // Configuration for charts
 const chartConfig = {
     colors: {
-        chart1: '#4b8cf2',
-        chart2: '#00cc99',
-        chart3: '#ffcc00',
-        chart4: '#ff6666'
+        chart1: '#80a5dc',
+        chart2: '#4b8cf2',
+        chart3: '#007bff',
+        chart4: '#00a2e8'
     },
     spreadsheetId: '1quphFwoVMjelWgxaF9jQi2qrAlHBir4Kc0LRUZRtaoY',
     sheets: {
