@@ -136,8 +136,9 @@ async function setup(app) {
   const INITIAL_CAMERA_POS_Z = 385;
   const INITIAL_CAMERA_ROT_X = THREE.Math.degToRad(20);
 
-  // Calculate midpoint rotation between Portugal and destination
+  // Calculate rotation to center the midpoint between Portugal and destination
   let INITIAL_GLOBE_ROTATION_Y = THREE.Math.degToRad(-100); // Default
+  let INITIAL_GLOBE_ROTATION_X = THREE.Math.degToRad(10);
   
   if (data.countries) {
     const portugal = data.countries.find(c => c.name.toUpperCase() === 'PORTUGAL');
@@ -145,27 +146,51 @@ async function setup(app) {
     
     if (portugal && destination) {
       const portugalLon = parseFloat(portugal.longitude);
+      const portugalLat = parseFloat(portugal.latitude);
       const destLon = parseFloat(destination.longitude);
+      const destLat = parseFloat(destination.latitude);
       
-      // Calculate midpoint longitude
-      let midLon = (portugalLon + destLon) / 2;
+      // Convert to radians for calculation
+      const lat1 = portugalLat * Math.PI / 180;
+      const lon1 = portugalLon * Math.PI / 180;
+      const lat2 = destLat * Math.PI / 180;
+      const lon2 = destLon * Math.PI / 180;
       
-      // Handle dateline crossing
-      if (Math.abs(destLon - portugalLon) > 180) {
-        midLon = (portugalLon + destLon) / 2 + 180;
-        if (midLon > 180) midLon -= 360;
-      }
+      // Convert to 3D Cartesian coordinates on unit sphere
+      const x1 = Math.cos(lat1) * Math.cos(lon1);
+      const y1 = Math.cos(lat1) * Math.sin(lon1);
+      const z1 = Math.sin(lat1);
       
-      // Convert to globe rotation (negative because globe rotates opposite)
-      INITIAL_GLOBE_ROTATION_Y = THREE.Math.degToRad(-midLon - 10);
-      console.log('✓ Globe centered between Portugal and ' + window.currentDestination);
-      console.log('  Portugal lon:', portugalLon, '| Dest lon:', destLon, '| Mid lon:', midLon);
+      const x2 = Math.cos(lat2) * Math.cos(lon2);
+      const y2 = Math.cos(lat2) * Math.sin(lon2);
+      const z2 = Math.sin(lat2);
+      
+      // Calculate midpoint in 3D space
+      const xMid = (x1 + x2) / 2;
+      const yMid = (y1 + y2) / 2;
+      const zMid = (z1 + z2) / 2;
+      
+      // Convert back to spherical coordinates (lat/lon)
+      const midLat = Math.atan2(zMid, Math.sqrt(xMid * xMid + yMid * yMid)) * 180 / Math.PI;
+      const midLon = Math.atan2(yMid, xMid) * 180 / Math.PI;
+      
+      // Rotate globe to bring midpoint to front (facing camera)
+      // Y rotation (horizontal): rotate to center the longitude
+      INITIAL_GLOBE_ROTATION_Y = THREE.Math.degToRad(-midLon);
+      
+      // X rotation (vertical tilt): tilt to center the latitude
+      INITIAL_GLOBE_ROTATION_X = THREE.Math.degToRad(-midLat);
+      
+      console.log('✓ Globe rotated to center arc midpoint between Portugal and ' + window.currentDestination);
+      console.log('  Portugal:', portugalLat.toFixed(2) + '°N, ' + portugalLon.toFixed(2) + '°E');
+      console.log('  Destination:', destLat.toFixed(2) + '°N, ' + destLon.toFixed(2) + '°E');
+      console.log('  3D Midpoint:', midLat.toFixed(2) + '°N, ' + midLon.toFixed(2) + '°E');
+      console.log('  Globe rotation: Y=' + (-midLon).toFixed(2) + '°, X=' + (-midLat).toFixed(2) + '°');
     } else {
       console.warn('⚠ Could not find Portugal or ' + window.currentDestination + ' for rotation calculation');
     }
   }
 
-  const INITIAL_GLOBE_ROTATION_X = THREE.Math.degToRad(10);
   const INITIAL_GLOBE_ROTATION_Z = THREE.Math.degToRad(0);
 
   const controllers = [];
@@ -271,10 +296,10 @@ async function setup(app) {
   const globe = new Globe();
   groups.main.add(globe);
 
-  // Apply initial globe rotation
-  groups.globe.rotation.x = INITIAL_GLOBE_ROTATION_X;
-  groups.globe.rotation.y = INITIAL_GLOBE_ROTATION_Y;
-  groups.globe.rotation.z = INITIAL_GLOBE_ROTATION_Z;
+  // Apply initial globe rotation (static, no animation)
+  groups.globe.rotation.x = THREE.Math.degToRad(10);
+  groups.globe.rotation.y = THREE.Math.degToRad(-100);
+  groups.globe.rotation.z = THREE.Math.degToRad(0);
 
   const points = new Points(data.grid);
   groups.globe.add(groups.points);
@@ -286,6 +311,60 @@ async function setup(app) {
   groups.globe.add(groups.lines);
 
   app.scene.add(groups.main);
+
+  // Setup periodic 360° rotation every 5 minutes
+  setupPeriodicRotation();
+}
+
+/**
+ * Configura rotação de 360 graus a cada 5 minutos
+ */
+function setupPeriodicRotation() {
+  const ROTATION_INTERVAL = 5 * 60 * 1000; // 5 minutos em milissegundos
+  const ROTATION_DURATION = 20000; // 20 segundos para completar a volta
+  
+  let isRotating = false;
+  let rotationStartTime = 0;
+  let initialRotationY = 0;
+  
+  // Inicia a primeira rotação após 5 minutos
+  setTimeout(() => {
+    startFullRotation();
+    // Depois repete a cada 5 minutos
+    setInterval(startFullRotation, ROTATION_INTERVAL);
+  }, ROTATION_INTERVAL);
+  
+  function startFullRotation() {
+    if (isRotating) return;
+    
+    isRotating = true;
+    rotationStartTime = Date.now();
+    initialRotationY = groups.globe.rotation.y;
+    
+    console.log('Starting 360° globe rotation');
+  }
+  
+  // Adiciona ao loop de animação
+  const originalAnimate = window.animate;
+  window.animate = function(app) {
+    if (originalAnimate) originalAnimate(app);
+    
+    if (isRotating) {
+      const elapsed = Date.now() - rotationStartTime;
+      const progress = Math.min(elapsed / ROTATION_DURATION, 1);
+      
+      // Rotação completa de 360 graus (2 * PI radianos)
+      const rotationAmount = progress * Math.PI * 2;
+      groups.globe.rotation.y = initialRotationY + rotationAmount;
+      
+      // Para quando completar a volta
+      if (progress >= 1) {
+        groups.globe.rotation.y = initialRotationY; // Volta exatamente ao ponto inicial
+        isRotating = false;
+        console.log('360° rotation complete');
+      }
+    }
+  };
 }
 
 

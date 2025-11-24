@@ -108,9 +108,9 @@ class Marker {
     const text = new fabric.Text(this.labelText, {
       left: 10, 
       top: 5, 
-      fill: this.textColor, 
+      fill: 'black', 
       fontFamily: 'Open Sans',
-      fontSize: 48
+      fontSize: 54
     });
 
     // Create a rounded rectangle background
@@ -120,7 +120,7 @@ class Marker {
       top: 0,
       width: text.width + padding * 2,
       height: text.height + padding * 2,
-      fill: 'rgba(255, 255, 255, 0.2)',
+      fill: 'rgba(255, 255, 255, 0.85)',
       rx: 8,
       ry: 8
     });
