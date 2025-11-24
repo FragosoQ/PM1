@@ -5,6 +5,12 @@
   <meta charset="UTF-8">
   <title>Three.js example</title>
   <link rel="stylesheet" href="styles/index.css">
+  <script>
+    // Auto refresh page every 2 hours (7200000 milliseconds)
+    setTimeout(() => {
+      location.reload();
+    }, 7200000);
+  </script>
 </head>
 
 <body>
@@ -41,7 +47,10 @@
         <div class="card-title">INFORMAÇÕES</div>
         <div class="info-panel-content-2"></div>
       </div>
-      <img src="https://static.wixstatic.com/media/a6967f_874354ad69c5461eafd229ab23540233~mv2.png" alt="Info" class="info-panel-image" />
+      <div class="info-panel-image-container">
+        <div class="status-indicator" id="status-indicator"></div>
+        <img src="https://static.wixstatic.com/media/a6967f_874354ad69c5461eafd229ab23540233~mv2.png" alt="Info" class="info-panel-image" />
+      </div>
     </div>
   </div>
 

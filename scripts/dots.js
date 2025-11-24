@@ -58,7 +58,7 @@ class Dot {
 
 			const {x, y, z} = this._path[this._pathIndex];
 			this.mesh.position.set(x, y, z);
-			this._pathIndex++;
+			this._pathIndex += 2; // Increased from 1 to 2 for double speed
 		} else {
 			this.mesh.visible = false;
 			this._path = null;

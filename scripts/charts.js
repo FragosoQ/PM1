@@ -212,7 +212,7 @@ const updateEvoProgress = async () => {
  * Fetches info panel data from Google Sheets (Modelo sheet)
  */
 const fetchInfoPanelData = async () => {
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=Modelo&range=A2:I2`;
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=Modelo&range=A2:J2`;
 
     try {
         const response = await d3.text(SHEET_URL);
@@ -226,12 +226,13 @@ const fetchInfoPanelData = async () => {
             b2: values[1] || '',
             c2: values[2] || '',
             g2: values[6] || '', // Column G is index 6
-            i2: values[8] || ''  // Column I is index 8
+            i2: values[8] || '', // Column I is index 8
+            j2: values[9] || ''  // Column J is index 9
         };
 
     } catch (error) {
         console.error('Error fetching info panel data:', error);
-        return { a2: '', b2: '', c2: '', g2: '', i2: '' };
+        return { a2: '', b2: '', c2: '', g2: '', i2: '', j2: '' };
     }
 };
 
@@ -258,6 +259,19 @@ const updateInfoPanel = async () => {
             <div class="info-line">${data.g2}</div>
             <div class="info-line">${data.i2}</div>
         `;
+    }
+    
+    // Update status indicator based on J2
+    const statusIndicator = document.getElementById('status-indicator');
+    if (statusIndicator) {
+        const status = data.j2.toUpperCase();
+        statusIndicator.classList.remove('status-on', 'status-off');
+        
+        if (status === 'ON') {
+            statusIndicator.classList.add('status-on');
+        } else if (status === 'OFF') {
+            statusIndicator.classList.add('status-off');
+        }
     }
     
     console.log('Info panel updated with:', data);

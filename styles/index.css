@@ -51,8 +51,8 @@ canvas {
   position: fixed;
   top: 16px;
   left: 16px;
-	/* 20% larger than 5.2vw */
-	width: 6.24vw;
+	/* 10% larger than 6.24vw */
+	width: 6.864vw;
   height: auto;
   z-index: 1000;
   background: transparent;
@@ -64,7 +64,7 @@ canvas {
   position: fixed;
   top: 16px;
   right: 16px;
-  width: 6.24vw;
+  width: 6.864vw;
   height: auto;
   z-index: 1000;
   background: transparent;
@@ -82,7 +82,7 @@ canvas {
 	position: fixed;
 	top: 100px;
 	left: 50px;
-	background: linear-gradient(90deg, #80a5dc 0%, #4b8cf2 30%, #007bff 100%);
+	background: linear-gradient(90deg, rgba(128, 165, 220, 0.8) 0%, rgba(75, 140, 242, 0.8) 30%, rgba(0, 123, 255, 0.8) 100%);
 	border-radius: 16px;
 	padding: 20px 30px;
 	z-index: 1000;
@@ -206,6 +206,35 @@ canvas {
 	text-align: left;
 }
 
+.info-panel-image-container {
+	position: relative;
+	display: flex;
+	align-items: stretch;
+	height: 100%;
+	flex-shrink: 0;
+}
+
+.status-indicator {
+	position: absolute;
+	right: 47px;
+	top: calc(25% - 35px);
+	height: 50%;
+	width: 8px;
+	border-radius: 4px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+	z-index: 1;
+}
+
+.status-indicator.status-on {
+	background-color: #00ff00;
+	box-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+}
+
+.status-indicator.status-off {
+	background-color: #ff0000;
+	box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+}
+
 .info-panel-image {
 	width: auto;
 	height: 100%;
@@ -214,6 +243,8 @@ canvas {
 	padding: 10px;
 	box-sizing: border-box;
 	flex-shrink: 0;
+	position: relative;
+	z-index: 2;
 }
 
 /* Progress bar */
