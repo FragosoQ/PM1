@@ -321,7 +321,7 @@ async function setup(app) {
  */
 function setupPeriodicRotation() {
   const ROTATION_INTERVAL = 10 * 1000; // 10 segundos em milissegundos
-  const ROTATION_DURATION = 20000; // 20 segundos para completar a volta
+  const ROTATION_DURATION = 5000; // 5 segundos para completar a volta
   
   let isRotating = false;
   let rotationStartTime = 0;
