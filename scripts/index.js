@@ -341,7 +341,10 @@ function setupPeriodicRotation() {
 
 function startRandomEffect() {
   // Escolhe aleatoriamente entre rotação (0) e pulsação (1)
-  const effect = Math.random() < 0.5 ? 'rotation' : 'pulse';
+  const randomValue = Math.random();
+  const effect = randomValue < 0.5 ? 'rotation' : 'pulse';
+  
+  console.log(`Random effect selected: ${effect} (random: ${randomValue.toFixed(2)})`);
   
   if (effect === 'rotation') {
     startFullRotation();
