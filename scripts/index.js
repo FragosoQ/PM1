@@ -316,33 +316,58 @@ async function setup(app) {
   setupPeriodicRotation();
 }
 
-// Variáveis globais para controle de rotação periódica
+// Variáveis globais para controle de efeitos periódicos
 let isRotating = false;
 let rotationStartTime = 0;
 let initialRotationY = 0;
-const ROTATION_INTERVAL = 25 * 1000; // 25 segundos
+let isPulsing = false;
+let pulseStartTime = 0;
+let initialPointsScale = 1.0;
+const EFFECT_INTERVAL = 25 * 1000; // 25 segundos
 const ROTATION_DURATION = 5000; // 5 segundos para completar a volta
+const PULSE_DURATION = 5000; // 5 segundos para completar a pulsação
 
 /**
- * Configura rotação de 360 graus a cada 25 segundos
+ * Configura efeitos aleatórios (rotação ou pulsação) a cada 25 segundos
  */
 function setupPeriodicRotation() {
-  // Inicia a primeira rotação após 25 segundos
+  // Inicia o primeiro efeito após 25 segundos
   setTimeout(() => {
-    startFullRotation();
+    startRandomEffect();
     // Depois repete a cada 25 segundos
-    setInterval(startFullRotation, ROTATION_INTERVAL);
-  }, ROTATION_INTERVAL);
+    setInterval(startRandomEffect, EFFECT_INTERVAL);
+  }, EFFECT_INTERVAL);
+}
+
+function startRandomEffect() {
+  // Escolhe aleatoriamente entre rotação (0) e pulsação (1)
+  const effect = Math.random() < 0.5 ? 'rotation' : 'pulse';
+  
+  if (effect === 'rotation') {
+    startFullRotation();
+  } else {
+    startPointsPulse();
+  }
 }
 
 function startFullRotation() {
-  if (isRotating) return;
+  if (isRotating || isPulsing) return;
   
   isRotating = true;
   rotationStartTime = Date.now();
   initialRotationY = groups.globe.rotation.y;
   
   console.log('Starting 360° globe rotation');
+}
+
+function startPointsPulse() {
+  if (isRotating || isPulsing) return;
+  
+  isPulsing = true;
+  pulseStartTime = Date.now();
+  initialPointsScale = groups.points.scale.x;
+  
+  console.log('Starting points pulse effect');
 }
 
 
@@ -361,6 +386,26 @@ function animate(app) {
       groups.globe.rotation.y = initialRotationY;
       isRotating = false;
       console.log('360° rotation complete');
+    }
+  }
+
+  // Lógica de pulsação dos pontos
+  if (isPulsing) {
+    const elapsed = Date.now() - pulseStartTime;
+    const progress = Math.min(elapsed / PULSE_DURATION, 1);
+    
+    // Função de easing suave (sin wave) para aumentar e diminuir
+    // Vai de 1.0 -> 1.5 -> 1.0
+    const easeProgress = Math.sin(progress * Math.PI);
+    const scale = initialPointsScale + (easeProgress * 0.5);
+    
+    groups.points.scale.set(scale, scale, scale);
+    
+    // Para quando completar a pulsação
+    if (progress >= 1) {
+      groups.points.scale.set(initialPointsScale, initialPointsScale, initialPointsScale);
+      isPulsing = false;
+      console.log('Points pulse complete');
     }
   }
 
