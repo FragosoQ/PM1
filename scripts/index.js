@@ -363,6 +363,11 @@ function startFullRotation() {
 function startPointsPulse() {
   if (isRotating || isPulsing) return;
   
+  if (!groups.points) {
+    console.warn('groups.points not available for pulse effect');
+    return;
+  }
+  
   isPulsing = true;
   pulseStartTime = Date.now();
   initialPointsScale = groups.points.scale.x;
@@ -390,7 +395,7 @@ function animate(app) {
   }
 
   // Lógica de pulsação dos pontos
-  if (isPulsing) {
+  if (isPulsing && groups.points) {
     const elapsed = Date.now() - pulseStartTime;
     const progress = Math.min(elapsed / PULSE_DURATION, 1);
     
