@@ -115,7 +115,7 @@ const drawDonutChart = (containerId, percentage, fillColor) => {
     const width = rect.width;
     const height = rect.height;
 
-    const size = Math.min(width, height) - 50;
+    const size = Math.min(width, height) - 20;
     
     if (size <= 0) {
         return; 
@@ -186,22 +186,6 @@ const drawDonutChart = (containerId, percentage, fillColor) => {
         .attr('stop-color', 'rgba(255, 255, 255, 0.08)')
         .attr('stop-opacity', 1);
 
-    // Add filter for glow effect (reduced to prevent overflow)
-    const filter = defs.append('filter')
-        .attr('id', `glow-${uniqueId}`)
-        .attr('x', '-20%')
-        .attr('y', '-20%')
-        .attr('width', '140%')
-        .attr('height', '140%');
-    
-    filter.append('feGaussianBlur')
-        .attr('stdDeviation', '2')
-        .attr('result', 'coloredBlur');
-    
-    const feMerge = filter.append('feMerge');
-    feMerge.append('feMergeNode').attr('in', 'coloredBlur');
-    feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
-
     const arcs = svg.selectAll('.arc')
         .data(pie(data))
         .enter()
@@ -211,8 +195,7 @@ const drawDonutChart = (containerId, percentage, fillColor) => {
     arcs.append('path')
         .attr('d', arc)
         .attr('fill', (d, i) => i === 0 ? `url(#fill-gradient-${uniqueId})` : `url(#empty-gradient-${uniqueId})`)
-        .attr('stroke', 'none')
-        .attr('filter', (d, i) => i === 0 ? `url(#glow-${uniqueId})` : 'none');
+        .attr('stroke', 'none');
 
     svg.append('text')
         .attr('text-anchor', 'middle')
