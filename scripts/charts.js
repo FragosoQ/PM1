@@ -139,6 +139,9 @@ const drawDonutChart = (containerId, percentage, fillColor) => {
         { value: 100 - percentage, name: 'Empty' }
     ];
 
+    // Generate unique ID for this chart
+    const uniqueId = `chart-${Math.random().toString(36).substr(2, 9)}`;
+
     const svg = container.append('svg')
         .attr('width', size)
         .attr('height', size)
@@ -153,7 +156,7 @@ const drawDonutChart = (containerId, percentage, fillColor) => {
     
     // Radial gradient for filled portion
     const fillGradient = defs.append('radialGradient')
-        .attr('id', `fill-gradient-${container.node().id}`)
+        .attr('id', `fill-gradient-${uniqueId}`)
         .attr('cx', '30%')
         .attr('cy', '30%');
     
@@ -169,7 +172,7 @@ const drawDonutChart = (containerId, percentage, fillColor) => {
     
     // Radial gradient for empty portion (lighter, more glassy)
     const emptyGradient = defs.append('radialGradient')
-        .attr('id', `empty-gradient-${container.node().id}`)
+        .attr('id', `empty-gradient-${uniqueId}`)
         .attr('cx', '30%')
         .attr('cy', '30%');
     
@@ -185,7 +188,7 @@ const drawDonutChart = (containerId, percentage, fillColor) => {
 
     // Add filter for glow effect
     const filter = defs.append('filter')
-        .attr('id', `glow-${container.node().id}`)
+        .attr('id', `glow-${uniqueId}`)
         .attr('x', '-50%')
         .attr('y', '-50%')
         .attr('width', '200%')
@@ -207,9 +210,9 @@ const drawDonutChart = (containerId, percentage, fillColor) => {
 
     arcs.append('path')
         .attr('d', arc)
-        .attr('fill', (d, i) => i === 0 ? `url(#fill-gradient-${container.node().id})` : `url(#empty-gradient-${container.node().id})`)
+        .attr('fill', (d, i) => i === 0 ? `url(#fill-gradient-${uniqueId})` : `url(#empty-gradient-${uniqueId})`)
         .attr('stroke', 'none')
-        .attr('filter', (d, i) => i === 0 ? `url(#glow-${container.node().id})` : 'none');
+        .attr('filter', (d, i) => i === 0 ? `url(#glow-${uniqueId})` : 'none');
 
     svg.append('text')
         .attr('text-anchor', 'middle')
