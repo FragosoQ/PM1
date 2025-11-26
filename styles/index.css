@@ -120,10 +120,10 @@ canvas {
 }
 
 .grid-item {
-	background-color: rgb(243, 241, 241);
+	background-color: rgb(243, 241, 241, 0.09);
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
-	border: 1px solid rgba(228, 9, 9, 0.25);
+	border: 1px solid rgba(238, 232, 232, 0.25);
 	border-radius: 16px;
 	display: flex;
 	flex-direction: column;
