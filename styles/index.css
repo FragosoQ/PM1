@@ -405,7 +405,7 @@ canvas {
 @media (max-width: 768px) and (orientation: portrait) {
 	.grid-container {
 		position: fixed;
-		top: 120px;
+		top: 160px;
 		right: auto;
 		left: 50%;
 		transform: translateX(-50%);
@@ -443,9 +443,12 @@ canvas {
 	}
 	
 	.destination-card {
-		top: 60px;
+		top: 100px;
 		right: 10px;
-		left: 10px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 90%;
+		max-width: 400px;
 		text-align: center;
 		padding: 10px 15px;
 	}
