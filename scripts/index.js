@@ -384,7 +384,7 @@ function startPointsPulse() {
   if (isRotating || isPulsing || isWaving) return;
   
   if (!groups.points) {
-    console.warn('groups.points not available for pulse effect');
+    console.warn('groups.points not available for heartbeat effect');
     return;
   }
   
@@ -392,7 +392,7 @@ function startPointsPulse() {
   pulseStartTime = Date.now();
   initialPointsScale = groups.points.scale.x;
   
-  console.log('Starting points pulse effect');
+  console.log('Starting points heartbeat effect');
 }
 
 function startPointsWave() {
@@ -428,23 +428,37 @@ function animate(app) {
     }
   }
 
-  // Lógica de pulsação dos pontos
+  // Lógica de pulsação dos pontos (simulando batimento cardíaco)
   if (isPulsing && groups.points) {
     const elapsed = Date.now() - pulseStartTime;
     const progress = Math.min(elapsed / PULSE_DURATION, 1);
     
-    // Função de easing suave (sin wave) para aumentar e diminuir
-    // Vai de 1.0 -> 1.5 -> 1.0
-    const easeProgress = Math.sin(progress * Math.PI);
-    const scale = initialPointsScale + (easeProgress * 0.5);
+    // Simula batimento cardíaco: duas pulsações rápidas seguidas de pausa
+    // Padrão: BOOM-boom...pause...BOOM-boom...pause
+    let scale = initialPointsScale;
+    
+    if (progress < 0.15) {
+      // Primeira pulsação forte (0% a 15%)
+      const localProgress = progress / 0.15;
+      const easeProgress = Math.sin(localProgress * Math.PI);
+      scale = initialPointsScale + (easeProgress * 0.6);
+    } else if (progress >= 0.2 && progress < 0.3) {
+      // Segunda pulsação mais fraca (20% a 30%)
+      const localProgress = (progress - 0.2) / 0.1;
+      const easeProgress = Math.sin(localProgress * Math.PI);
+      scale = initialPointsScale + (easeProgress * 0.3);
+    } else {
+      // Pausa entre batimentos
+      scale = initialPointsScale;
+    }
     
     groups.points.scale.set(scale, scale, scale);
     
-    // Para quando completar a pulsação
+    // Para quando completar o batimento
     if (progress >= 1) {
       groups.points.scale.set(initialPointsScale, initialPointsScale, initialPointsScale);
       isPulsing = false;
-      console.log('Points pulse complete');
+      console.log('Points heartbeat complete');
     }
   }
 
