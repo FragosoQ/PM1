@@ -239,11 +239,17 @@ canvas {
 	text-align: left;
 }
 
+.info-panel-card-4 {
+	flex: 1;
+	min-height: 0;
+}
+
 .info-panel-image-container {
 	position: relative;
 	display: flex;
 	align-items: stretch;
 	height: 100%;
+	width: 100%;
 	flex-shrink: 0;
 }
 
