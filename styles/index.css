@@ -5,7 +5,8 @@ html {
 	margin: 0;
 	padding: 0;
 	font-family: 'Open Sans', sans-serif;
-	background: radial-gradient(circle, #01061a, #000000);
+	/*background: radial-gradient(circle, #01061a, #000000);*/
+	background: radial-gradient(circle, #80a5dc 0%, #4b8cf2 50%, #007bff 100%);
 }
 
 canvas {
