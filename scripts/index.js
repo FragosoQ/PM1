@@ -325,10 +325,13 @@ let pulseStartTime = 0;
 let initialPointsScale = 1.0;
 let isWaving = false;
 let waveStartTime = 0;
+let isGlowing = false;
+let glowStartTime = 0;
 const EFFECT_INTERVAL = 25 * 1000; // 25 segundos
 const ROTATION_DURATION = 5000; // 5 segundos para completar a volta
 const PULSE_DURATION = 2000; // 2 segundos para completar a pulsação
 const WAVE_DURATION = 3000; // 3 segundos para completar a ondulação
+const GLOW_DURATION = 4000; // 4 segundos para completar a transição de cor
 
 /**
  * Configura efeitos aleatórios (rotação ou pulsação) a cada 25 segundos
@@ -347,16 +350,18 @@ function setupPeriodicRotation() {
 }
 
 function startRandomEffect() {
-  // Escolhe aleatoriamente entre rotação, pulsação e ondulação
+  // Escolhe aleatoriamente entre rotação, pulsação, ondulação e brilho
   const randomValue = Math.random();
   let effect;
   
-  if (randomValue < 0.33) {
+  if (randomValue < 0.25) {
     effect = 'rotation';
-  } else if (randomValue < 0.66) {
+  } else if (randomValue < 0.5) {
     effect = 'pulse';
-  } else {
+  } else if (randomValue < 0.75) {
     effect = 'wave';
+  } else {
+    effect = 'glow';
   }
   
   console.log(`Random effect selected: ${effect} (random: ${randomValue.toFixed(2)})`);
@@ -365,13 +370,15 @@ function startRandomEffect() {
     startFullRotation();
   } else if (effect === 'pulse') {
     startPointsPulse();
-  } else {
+  } else if (effect === 'wave') {
     startPointsWave();
+  } else {
+    startGlobeGlow();
   }
 }
 
 function startFullRotation() {
-  if (isRotating || isPulsing || isWaving) return;
+  if (isRotating || isPulsing || isWaving || isGlowing) return;
   
   isRotating = true;
   rotationStartTime = Date.now();
@@ -381,7 +388,7 @@ function startFullRotation() {
 }
 
 function startPointsPulse() {
-  if (isRotating || isPulsing || isWaving) return;
+  if (isRotating || isPulsing || isWaving || isGlowing) return;
   
   if (!groups.points) {
     console.warn('groups.points not available for heartbeat effect');
@@ -396,7 +403,7 @@ function startPointsPulse() {
 }
 
 function startPointsWave() {
-  if (isRotating || isPulsing || isWaving) return;
+  if (isRotating || isPulsing || isWaving || isGlowing) return;
   
   if (!elements.globePoints) {
     console.warn('elements.globePoints not available for color transition effect');
@@ -406,7 +413,21 @@ function startPointsWave() {
   isWaving = true;
   waveStartTime = Date.now();
   
-  console.log('Starting points color transition effect');
+  console.log('Starting points color wave effect');
+}
+
+function startGlobeGlow() {
+  if (isRotating || isPulsing || isWaving || isGlowing) return;
+  
+  if (!elements.globe) {
+    console.warn('elements.globe not available for glow effect');
+    return;
+  }
+  
+  isGlowing = true;
+  glowStartTime = Date.now();
+  
+  console.log('Starting globe glow effect');
 }
 
 
@@ -490,6 +511,34 @@ function animate(app) {
       elements.globePoints.material.color.set(config.colors.globeDotColor);
       isWaving = false;
       console.log('Points color transition complete');
+    }
+  }
+
+  // Lógica de transição de cor do globo (glow)
+  if (isGlowing && elements.globe) {
+    const elapsed = Date.now() - glowStartTime;
+    const progress = Math.min(elapsed / GLOW_DURATION, 1);
+    
+    // Função de easing suave (sin wave) para transição ida e volta
+    // Vai de 0 -> 1 -> 0
+    const colorProgress = Math.sin(progress * Math.PI);
+    
+    // Cor original (escura) e cor de destino (branco)
+    const originalColor = new THREE.Color(config.colors.globeColor);
+    const targetColor = new THREE.Color(0xffffff); // Branco
+    
+    // Interpola entre as cores
+    const currentColor = originalColor.clone().lerp(targetColor, colorProgress);
+    
+    // Aplica a cor interpolada ao globo
+    elements.globe.material.color.set(currentColor);
+    
+    // Para quando completar a transição
+    if (progress >= 1) {
+      // Restaura cor original
+      elements.globe.material.color.set(config.colors.globeColor);
+      isGlowing = false;
+      console.log('Globe glow transition complete');
     }
   }
 
