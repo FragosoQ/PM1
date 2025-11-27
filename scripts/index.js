@@ -325,7 +325,7 @@ let pulseStartTime = 0;
 let initialPointsScale = 1.0;
 const EFFECT_INTERVAL = 25 * 1000; // 25 segundos
 const ROTATION_DURATION = 5000; // 5 segundos para completar a volta
-const PULSE_DURATION = 5000; // 5 segundos para completar a pulsação
+const PULSE_DURATION = 2000; // 2 segundos para completar a pulsação
 
 /**
  * Configura efeitos aleatórios (rotação ou pulsação) a cada 25 segundos
