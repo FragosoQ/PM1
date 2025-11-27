@@ -323,9 +323,12 @@ let initialRotationY = 0;
 let isPulsing = false;
 let pulseStartTime = 0;
 let initialPointsScale = 1.0;
+let isWaving = false;
+let waveStartTime = 0;
 const EFFECT_INTERVAL = 25 * 1000; // 25 segundos
 const ROTATION_DURATION = 5000; // 5 segundos para completar a volta
 const PULSE_DURATION = 2000; // 2 segundos para completar a pulsação
+const WAVE_DURATION = 3000; // 3 segundos para completar a ondulação
 
 /**
  * Configura efeitos aleatórios (rotação ou pulsação) a cada 25 segundos
@@ -344,21 +347,31 @@ function setupPeriodicRotation() {
 }
 
 function startRandomEffect() {
-  // Escolhe aleatoriamente entre rotação (0) e pulsação (1)
+  // Escolhe aleatoriamente entre rotação, pulsação e ondulação
   const randomValue = Math.random();
-  const effect = randomValue < 0.5 ? 'rotation' : 'pulse';
+  let effect;
+  
+  if (randomValue < 0.33) {
+    effect = 'rotation';
+  } else if (randomValue < 0.66) {
+    effect = 'pulse';
+  } else {
+    effect = 'wave';
+  }
   
   console.log(`Random effect selected: ${effect} (random: ${randomValue.toFixed(2)})`);
   
   if (effect === 'rotation') {
     startFullRotation();
-  } else {
+  } else if (effect === 'pulse') {
     startPointsPulse();
+  } else {
+    startPointsWave();
   }
 }
 
 function startFullRotation() {
-  if (isRotating || isPulsing) return;
+  if (isRotating || isPulsing || isWaving) return;
   
   isRotating = true;
   rotationStartTime = Date.now();
@@ -368,7 +381,7 @@ function startFullRotation() {
 }
 
 function startPointsPulse() {
-  if (isRotating || isPulsing) return;
+  if (isRotating || isPulsing || isWaving) return;
   
   if (!groups.points) {
     console.warn('groups.points not available for pulse effect');
@@ -380,6 +393,20 @@ function startPointsPulse() {
   initialPointsScale = groups.points.scale.x;
   
   console.log('Starting points pulse effect');
+}
+
+function startPointsWave() {
+  if (isRotating || isPulsing || isWaving) return;
+  
+  if (!elements.globePoints) {
+    console.warn('elements.globePoints not available for wave effect');
+    return;
+  }
+  
+  isWaving = true;
+  waveStartTime = Date.now();
+  
+  console.log('Starting points wave effect');
 }
 
 
@@ -418,6 +445,45 @@ function animate(app) {
       groups.points.scale.set(initialPointsScale, initialPointsScale, initialPointsScale);
       isPulsing = false;
       console.log('Points pulse complete');
+    }
+  }
+
+  // Lógica de ondulação dos pontos
+  if (isWaving && elements.globePoints) {
+    const elapsed = Date.now() - waveStartTime;
+    const progress = Math.min(elapsed / WAVE_DURATION, 1);
+    
+    const positions = elements.globePoints.geometry.attributes.position.array;
+    const sizes = elements.globePoints.geometry.attributes.size.array;
+    
+    // Cria uma onda que se propaga pelos pontos
+    for (let i = 0; i < positions.length; i += 3) {
+      const x = positions[i];
+      const y = positions[i + 1];
+      const z = positions[i + 2];
+      
+      // Calcula a distância do ponto ao eixo Y
+      const distance = Math.sqrt(x * x + z * z);
+      
+      // Cria uma onda baseada no tempo e distância
+      const wave = Math.sin((progress * Math.PI * 4) - (distance / 50));
+      
+      // Modifica o tamanho dos pontos
+      const baseSize = config.sizes.globeDotSize;
+      sizes[i / 3] = baseSize + (wave * baseSize * 0.8);
+    }
+    
+    elements.globePoints.geometry.attributes.size.needsUpdate = true;
+    
+    // Para quando completar a ondulação
+    if (progress >= 1) {
+      // Restaura tamanhos originais
+      for (let i = 0; i < sizes.length; i++) {
+        sizes[i] = config.sizes.globeDotSize;
+      }
+      elements.globePoints.geometry.attributes.size.needsUpdate = true;
+      isWaving = false;
+      console.log('Points wave complete');
     }
   }
 
