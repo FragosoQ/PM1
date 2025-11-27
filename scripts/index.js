@@ -399,14 +399,14 @@ function startPointsWave() {
   if (isRotating || isPulsing || isWaving) return;
   
   if (!elements.globePoints) {
-    console.warn('elements.globePoints not available for wave effect');
+    console.warn('elements.globePoints not available for color transition effect');
     return;
   }
   
   isWaving = true;
   waveStartTime = Date.now();
   
-  console.log('Starting points wave effect');
+  console.log('Starting points color transition effect');
 }
 
 
@@ -448,42 +448,31 @@ function animate(app) {
     }
   }
 
-  // Lógica de ondulação dos pontos
+  // Lógica de transição de cor dos pontos (azul -> branco -> azul)
   if (isWaving && elements.globePoints) {
     const elapsed = Date.now() - waveStartTime;
     const progress = Math.min(elapsed / WAVE_DURATION, 1);
     
-    const positions = elements.globePoints.geometry.attributes.position.array;
-    const sizes = elements.globePoints.geometry.attributes.size.array;
+    // Função de easing suave (sin wave) para transição ida e volta
+    // Vai de 0 -> 1 -> 0
+    const colorProgress = Math.sin(progress * Math.PI);
     
-    // Cria uma onda que se propaga pelos pontos
-    for (let i = 0; i < positions.length; i += 3) {
-      const x = positions[i];
-      const y = positions[i + 1];
-      const z = positions[i + 2];
-      
-      // Calcula a distância do ponto ao eixo Y
-      const distance = Math.sqrt(x * x + z * z);
-      
-      // Cria uma onda baseada no tempo e distância
-      const wave = Math.sin((progress * Math.PI * 4) - (distance / 50));
-      
-      // Modifica o tamanho dos pontos
-      const baseSize = config.sizes.globeDotSize;
-      sizes[i / 3] = baseSize + (wave * baseSize * 0.8);
-    }
+    // Cor original (azul) e cor de destino (branco)
+    const originalColor = new THREE.Color(config.colors.globeDotColor);
+    const targetColor = new THREE.Color(0xffffff); // Branco
     
-    elements.globePoints.geometry.attributes.size.needsUpdate = true;
+    // Interpola entre as cores
+    const currentColor = originalColor.clone().lerp(targetColor, colorProgress);
     
-    // Para quando completar a ondulação
+    // Aplica a cor interpolada
+    elements.globePoints.material.color.set(currentColor);
+    
+    // Para quando completar a transição
     if (progress >= 1) {
-      // Restaura tamanhos originais
-      for (let i = 0; i < sizes.length; i++) {
-        sizes[i] = config.sizes.globeDotSize;
-      }
-      elements.globePoints.geometry.attributes.size.needsUpdate = true;
+      // Restaura cor original
+      elements.globePoints.material.color.set(config.colors.globeDotColor);
       isWaving = false;
-      console.log('Points wave complete');
+      console.log('Points color transition complete');
     }
   }
 
