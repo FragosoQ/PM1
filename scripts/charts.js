@@ -4,14 +4,18 @@ const chartConfig = {
         chart1: '#80a5dc',
         chart2: '#4b8cf2',
         chart3: '#007bff',
-        chart4: '#00a2e8'
+        chart4: '#00a2e8',
+        chart5: '#5bc0de',
+        chart6: '#3a94ff'
     },
     spreadsheetId: '1quphFwoVMjelWgxaF9jQi2qrAlHBir4Kc0LRUZRtaoY',
     sheets: {
         chart1: 'CUBA',
         chart2: 'INTERIORES',
         chart3: 'TESTES',
-        chart4: 'EXTERIORES'
+        chart4: 'EXTERIORES',
+        chart5: 'ESTRUTURA',
+        chart6: 'ÁREA TÉCNICA'
     }
 };
 
@@ -214,7 +218,9 @@ const updateAllCharts = async () => {
         { id: '#grid-item-1', sheet: chartConfig.sheets.chart1, color: chartConfig.colors.chart1 },
         { id: '#grid-item-2', sheet: chartConfig.sheets.chart2, color: chartConfig.colors.chart2 },
         { id: '#grid-item-3', sheet: chartConfig.sheets.chart3, color: chartConfig.colors.chart3 },
-        { id: '#grid-item-4', sheet: chartConfig.sheets.chart4, color: chartConfig.colors.chart4 }
+        { id: '#grid-item-4', sheet: chartConfig.sheets.chart4, color: chartConfig.colors.chart4 },
+        { id: '#grid-item-5', sheet: chartConfig.sheets.chart5, color: chartConfig.colors.chart5 },
+        { id: '#grid-item-6', sheet: chartConfig.sheets.chart6, color: chartConfig.colors.chart6 }
     ];
 
     for (const chart of charts) {

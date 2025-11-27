@@ -120,7 +120,7 @@ canvas {
 	right: 50px;
 	display: grid;
 	grid-template-columns: repeat(2, 397px);
-	grid-template-rows: 1fr 1fr 1fr;
+	grid-template-rows: repeat(3, 1fr) auto;
 	gap: 20px;
 	z-index: 1000;
 }
