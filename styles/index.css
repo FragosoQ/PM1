@@ -231,11 +231,13 @@ canvas {
 	flex: 1;
 	padding: 5px;
 	box-sizing: border-box;
+	overflow: hidden;
 }
 
 .goal-chart {
-	width: 100%;
+	width: auto;
 	height: 100%;
+	max-width: 100%;
 	max-height: 100%;
 }
 
