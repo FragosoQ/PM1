@@ -59,7 +59,7 @@ canvas {
   top: 16px;
   left: 16px;
 	/* 10% larger than 6.24vw */
-	width: 6.864vw;
+	width: 180px;/*6.864vw;*/
   height: auto;
   max-width: 180px;
   z-index: 1000;
@@ -72,7 +72,7 @@ canvas {
   position: fixed;
   top: 16px;
   right: 16px;
-  width: 6.864vw;
+  width: 180px;/*6.864vw;*/
   height: auto;
   z-index: 1000;
   background: transparent;
