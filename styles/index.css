@@ -341,6 +341,7 @@ position: absolute;
   }
   .grid-container {
     grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     gap: 30px;
   }
   .card-title {
@@ -358,7 +359,8 @@ position: absolute;
     max-width: 120px;
   }
   .grid-container {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
     gap: 15px;
   }
   .card-title {
