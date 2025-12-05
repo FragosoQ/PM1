@@ -13,15 +13,7 @@ html {
 	width: 100vw;
 	height: 100vh;
 	position: relative;
-}
-
-/* Scale content for smaller screens/TVs */
-@media screen and (max-width: 1600px) {
-	body {
-		zoom: 0.8;
-		-moz-transform: scale(0.8);
-		-moz-transform-origin: 0 0;
-	}
+	transform-origin: 0 0;
 }
 
 canvas {
