@@ -20,7 +20,6 @@
       width: 100vw;
       height: 100vh;
       font-family: 'Open Sans', sans-serif;
-      /* Se quiseres o gradiente no CSS em vez do JS: */
       background: radial-gradient(circle, #020d3a, #000000);
     }
     
@@ -33,11 +32,10 @@
       vertical-align: top;
     }
 
-    /* --- LOGOS (Tamanhos Controlados) --- */
+    /* --- LOGOS --- */
     .top-left-logo, .top-right-logo {
       position: fixed;
       top: 2vh; 
-      /* Tamanho inteligente: Min 80px, Ideal 10% da largura, Max 150px */
       width: clamp(80px, 10vw, 150px);
       height: auto;
       z-index: 1000;
@@ -51,7 +49,7 @@
     /* --- DESTINATION CARD --- */
     .destination-card {
       position: fixed;
-      top: 15vh; /* Posição relativa vertical */
+      top: 15vh;
       left: 4vw;
       background-color: rgba(243, 241, 241, 0.1);
       backdrop-filter: blur(20px);
@@ -77,26 +75,20 @@
       50% { box-shadow: 0 0 20px rgba(5, 187, 237, 0.6); }
     }
 
-/* --- GRID CONTAINER (Lado Direito) --- */
+    /* --- GRID CONTAINER --- */
     .grid-container {
       position: fixed;
       top: 15vh;
       bottom: 5vh;
       right: 4vw;
-      
-      /* --- ALTERAÇÃO AQUI --- */
-      /* Aumentei significativamente a largura */
-      /* Mínimo: 600px (era 300px) */
-      /* Ideal: 50vw (metade do ecrã - era 28vw) */
-      /* Máximo: 1000px (era 500px) */
       width: clamp(600px, 50vw, 1000px);
-      
       display: grid;
-      /* Mantém as 3 colunas, agora mais largas */
-      grid-template-columns: repeat(3, 1fr); 
-      grid-template-rows: 1fr 1fr auto;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 1fr 1fr auto auto; /* Adicionado mais um 'auto' para a barra */
       gap: 1.5vh;
       z-index: 1000;
+      /* No desktop, deixamos o overflow visível para a barra fixa sair se necessário, 
+         mas como ela é fixed no desktop, não afeta a grid */
     }
 
     .grid-item {
@@ -115,7 +107,7 @@
       box-sizing: border-box;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
       overflow: hidden;
-      min-height: 0; /* Importante para o grid não rebentar */
+      min-height: 0;
     }
 
     .card-title {
@@ -134,7 +126,7 @@
       justify-content: center;
     }
 
-    /* --- INFO PANELS (Ajustes de texto grande) --- */
+    /* --- INFO PANELS --- */
     .info-panel-content-1 {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -146,7 +138,6 @@
     }
 
     .info-panel-content-1 .info-line {
-      /* O Segredo: Reduzir o tamanho máximo do número */
       font-size: clamp(40px, 10vw, 90px) !important;
       font-weight: bold;
       line-height: 0.95;
@@ -161,6 +152,17 @@
       flex-direction: column;
       gap: 4px;
     }
+
+    /* Alinhamento Esquerda (Planeamento) */
+    .info-panel-card-2 .card-title {
+        text-align: left !important;
+        padding-left: 10px;
+    }
+    .info-panel-card-2 .info-panel-content-2 {
+        align-items: flex-start !important;
+        text-align: left;
+        padding-left: 10px !important;
+    }
     
     .info-line {
         color: white;
@@ -168,32 +170,31 @@
         line-height: 1.3;
     }
 
-    /* --- BOTTOM SECTION (Imagens e Status) --- */
+    /* --- BOTTOM SECTION (1x4) --- */
     .bottom-section {
       grid-column: 1 / 4;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 10px;
       min-height: 0;
-      height: 18vh; /* Altura fixa relativa */
+      height: 18vh;
       max-height: 200px;
     }
 
-.goal-chart-container {
+    .goal-chart-container {
         display: flex;
         align-items: center;
         justify-content: center;
         width: 100%;
         height: 100%;
         padding: 5px;
-        box-sizing: border-box; /* Garante que o padding não rouba espaço */
-        overflow: hidden; /* Garante que nada sai para fora */
+        box-sizing: border-box;
+        overflow: hidden;
     }
     
     .goal-chart {
         width: 100%;
         height: 100%;
-        /* Isto é crucial: permite que o SVG escale mantendo a proporção */
         max-width: 100%;
         max-height: 100%;
         display: block;
@@ -229,12 +230,14 @@
     .status-indicator.status-off { background-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
 
     /* --- PROGRESS BAR --- */
+    /* Configuração Padrão (Desktop/TV) - Mantém-se fixa */
     .progress-bar-container {
       position: fixed;
       bottom: 5vh;
       left: 4vw;
       width: clamp(200px, 40vw, 600px);
       z-index: 1000;
+      /* Como está fixed, ignora o grid layout pai no Desktop */
     }
 
     .progress-bar-wrapper {
@@ -252,13 +255,11 @@
       transition: width 0.5s ease;
     }
     
-    /* UTILS */
     .dg.a { margin-top: 10px; }
     .dg .close-button, .dg .close, .dg .title { display: none !important; }
 
     /* --- MEDIA QUERIES --- */
-
-    /* Tablet (Portrait) */
+    
     @media (max-width: 1024px) {
       .grid-container {
         width: 35vw;
@@ -267,7 +268,6 @@
       }
     }
 
-    /* Mobile */
     @media (max-width: 768px) {
       .top-left-logo, .top-right-logo { width: 60px; top: 10px; }
       
@@ -279,22 +279,41 @@
       .grid-container {
         top: auto; bottom: 20px; right: 10px; left: 10px;
         width: auto;
+        /* Mobile: 3 colunas, mas vamos fazer span */
         grid-template-columns: repeat(3, 1fr);
         grid-template-rows: auto;
         height: auto;
         gap: 8px;
+        /* Permitir scroll se necessário, embora não deva precisar */
+        overflow-y: visible; 
       }
       
-      .bottom-section { height: auto; }
+      .bottom-section { 
+          height: auto; 
+          /* Garante que a bottom section ocupe toda a largura antes da barra */
+          grid-column: 1 / -1; 
+      }
       
+      /* --- MAGIC MOVE DO PROGRESS BAR NO MOBILE --- */
       .progress-bar-container {
-        bottom: 180px; left: 50%; transform: translateX(-50%); width: 90%;
+        /* Removemos o fixed */
+        position: relative !important;
+        /* Removemos coordenadas fixas */
+        bottom: auto;
+        left: auto;
+        transform: none;
+        
+        /* Ajuste de largura e posição na grid */
+        width: 100% !important;
+        margin-top: 15px; /* Espaço entre a grid e a barra */
+        
+        /* Fazemos a barra ocupar toda a largura da grid (3 colunas) */
+        grid-column: 1 / -1; 
       }
     }
   </style>
 
   <script>
-    // Auto refresh page every 2 hours (7200000 milliseconds)
     setTimeout(() => {
       location.reload();
     }, 7200000);
@@ -334,6 +353,7 @@
       <div class="card-title">ÁREA TÉCNICA</div>
       <div class="card-chart"></div>
     </div>
+    
     <div class="bottom-section">
       <div class="grid-item info-panel-card-1">
         <div class="card-title"></div>
@@ -346,7 +366,7 @@
       <div class="grid-item info-panel-card-3">
         <div class="card-title">GOAL</div>
         <div class="goal-chart-container">
-          <svg class="goal-chart" viewBox="0 0 200 200">
+          <svg class="goal-chart" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet">
             <circle cx="100" cy="100" r="80" fill="none" stroke="rgba(90,108,125,0.3)" stroke-width="20"/>
             <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(90,108,125,0.3)" stroke-width="15"/>
             <circle cx="100" cy="100" r="42" fill="none" stroke="rgba(90,108,125,0.3)" stroke-width="8"/>
@@ -372,16 +392,15 @@
         </div>
       </div>
     </div>
-  </div>
-
-  <div class="app-wrapper">
-    <ul class="markers"></ul>
-  </div>
-
-  <div class="progress-bar-container">
-    <div class="progress-bar-wrapper">
-      <div class="progress-bar-fill" id="evo-progress"></div>
+    
+    <div class="progress-bar-container">
+      <div class="progress-bar-wrapper">
+        <div class="progress-bar-fill" id="evo-progress"></div>
+      </div>
     </div>
+
+  </div> <div class="app-wrapper">
+    <ul class="markers"></ul>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/106/three.min.js"></script>
