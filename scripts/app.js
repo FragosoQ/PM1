@@ -19,61 +19,67 @@ class App {
 
     this.render();
     this.update();
+    
+    // --- ALTERAÇÃO 1: Forçar ajuste inicial ---
+    // Isto garante que o globo começa logo na posição certa sem precisares de mexer na janela
+    this.handleResize();
   }
 
   initScene = () => {
     this.scene = new THREE.Scene();
   }
 
+  // --- ALTERAÇÃO 2: Limpeza do CSS ---
   initRenderer = () => {
-    this.renderer = new THREE.WebGLRenderer({alpha: true});
+    this.renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
     this.renderer.setClearColor(0x000000, 0.0);
-    // Position the canvas so globe center is 500px from left edge
-    this.renderer.domElement.style.position = 'relative';
-    this.renderer.domElement.style.left = '500px';
-    this.renderer.domElement.style.transform = 'translateX(-50%)';
-    this.renderer.domElement.style.willChange = 'transform';
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(window.devicePixelRatio * 1.5);
+    
+    // REMOVIDO: left='500px' e transform. Isso estragava o mobile.
+    // AGORA: Ocupa o ecrã todo. A posição do globo é controlada pela câmara.
+    this.renderer.domElement.style.position = 'absolute';
+    this.renderer.domElement.style.top = '0';
+    this.renderer.domElement.style.left = '0';
+    this.renderer.domElement.style.width = '100%';
+    this.renderer.domElement.style.height = '100%';
+    
+    // Ajuste de performance para mobile (evita aquecimento)
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    
     this.renderer.shadowMap.enabled = true;
-    this.renderer.antialias = true;
   }
 
   initCamera = () => {
     this.ratio = window.innerWidth / window.innerHeight;
     this.camera = new THREE.PerspectiveCamera(60, this.ratio, 0.1, 10000);
-    this.camera.lookAt(this.scene.position);
+    this.camera.lookAt(0, 0, 0);
     this.camera.position.set(0, 15, 30);
   }
 
   initControls = () => {
     this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-    this.controls.autoRotate = animations.rotateGlobe;
+    this.controls.enableDamping = true; // Movimento mais suave
+    this.controls.dampingFactor = 0.05;
+    
+    this.controls.autoRotate = typeof animations !== 'undefined' ? animations.rotateGlobe : false;
     this.controls.autoRotateSpeed = 0.4;
-    // Always sync autoRotate to the toggle after any interaction
+    
     const syncAutoRotate = () => {
-      this.controls.autoRotate = animations.rotateGlobe;
+      if(typeof animations !== 'undefined') {
+        this.controls.autoRotate = animations.rotateGlobe;
+      }
     };
     this.controls.addEventListener('end', syncAutoRotate);
-    this.controls.addEventListener('change', syncAutoRotate);
     this.controls.addEventListener('start', syncAutoRotate);
   }
 
   initStats = () => {
     this.stats = new Stats();
     this.stats.setMode(0);
-    this.stats.domElement.style.position = 'absolute';
-    this.stats.domElement.style.right = '10px';
-    this.stats.domElement.style.bottom = '10px';
-    // Instead of appending the live canvas element to the DOM, insert it as an HTML comment
-    // so the markup is preserved in the page source but not rendered.
     try {
       const statsEl = this.stats.domElement;
       const comment = document.createComment(statsEl && statsEl.outerHTML ? statsEl.outerHTML : 'stats-canvas');
       document.body.appendChild(comment);
-    } catch (e) {
-      // fallback to not appending if something goes wrong
-    }
+    } catch (e) {}
   }
 
   render = () => {
@@ -83,17 +89,12 @@ class App {
 
   update = () => {
     this.animate(this);
-    this.stats.update();
-    // Force OrbitControls autoRotate to match the toggle every frame, and forcibly reset internal state
+    if(this.stats) this.stats.update();
+    
     if (this.controls) {
-      if (animations.rotateGlobe) {
+      if (typeof animations !== 'undefined' && animations.rotateGlobe) {
         this.controls.autoRotate = true;
-        // Patch: forcibly reset internal state that disables autoRotate after interaction
-        if (typeof this.controls._state !== 'undefined') {
-          this.controls._state = -1; // disables drag state in some versions
-        }
-      } else {
-        this.controls.autoRotate = false;
+        if (typeof this.controls._state !== 'undefined') this.controls._state = -1;
       }
       this.controls.update();
     }
@@ -102,13 +103,32 @@ class App {
   }
 
   addControlGui = callback => {
+    if (typeof dat === 'undefined') return;
     var gui = new dat.GUI();
     callback(gui);
   }
 
+  // --- ALTERAÇÃO 3: O Segredo do Posicionamento ---
   handleResize = () => {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    this.camera.aspect = width / height;
+    this.renderer.setSize(width, height);
+
+    // LÓGICA:
+    // Se for Desktop (>900px), empurramos o globo para a esquerda.
+    // Se for Mobile, deixamos no centro.
+    if (width > 900) {
+        // width * 0.25 move o centro cerca de 25% para a esquerda.
+        // Podes aumentar para 0.3 ou diminuir para 0.15 para ajustar a margem.
+        const offset = width * 0.25; 
+        this.camera.setViewOffset(width, height, offset, 0, width, height);
+    } else {
+        // Mobile: Reset total para o centro
+        this.camera.clearViewOffset();
+    }
+
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 }
