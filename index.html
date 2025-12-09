@@ -78,7 +78,7 @@
     /* --- GRID CONTAINER --- */
     .grid-container {
       position: fixed;
-      top: 14vh;
+      top: 10vh;
       bottom: 5vh;
       right: 4vw;
       width: clamp(600px, 50vw, 1000px);
@@ -218,7 +218,7 @@
 
     .status-indicator {
       position: absolute;
-      right: 35px;
+      right: 48px;
       top: 28%;
       transform: translateY(-50%);
       height: 45%;
@@ -229,15 +229,22 @@
     .status-indicator.status-on { background-color: #00ff00; box-shadow: 0 0 10px #00ff00; }
     .status-indicator.status-off { background-color: #ff0000; box-shadow: 0 0 10px #ff0000; }
 
-    /* --- PROGRESS BAR --- */
-    /* Configuração Padrão (Desktop/TV) - Mantém-se fixa */
+ /* --- PROGRESS BAR --- */
+    /* Configuração Padrão (Desktop/TV) */
     .progress-bar-container {
       position: fixed;
       bottom: 5vh;
-      left: 4vw;
-      width: clamp(200px, 40vw, 600px);
+      
+      /* --- O SEGREDO DO CENTRO --- */
+      /* Definimos a esquerda a 25% (o centro da área livre do globo) */
+      left: 25vw; 
+      /* Usamos o transform para garantir que é o MEIO da barra que fica nos 25% */
+      transform: translateX(-50%);
+      
+      width: clamp(200px, 30vw, 500px);
       z-index: 1000;
-      /* Como está fixed, ignora o grid layout pai no Desktop */
+      /* Pointer events none garante que não bloqueia cliques no globo se for transparente */
+      pointer-events: none; 
     }
 
     .progress-bar-wrapper {
