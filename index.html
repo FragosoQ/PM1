@@ -266,7 +266,7 @@
       .top-left-logo, .top-right-logo { width: 60px; top: 10px; }
       
       .destination-card {
-        top: 75px; left: 50%; transform: translateX(-50%);
+        top: 80px; left: 50%; transform: translateX(-50%);
         width: 90%; max-width: none;
       }
 
@@ -316,25 +316,6 @@
     setTimeout(() => {
       location.reload();
     }, 7200000);
-
-    // Ajustar dinamicamente a posição do destination-card no mobile
-    function adjustDestinationCardPosition() {
-      if (window.innerWidth <= 768) {
-        const logo = document.getElementById('main-logo');
-        const destinationCard = document.querySelector('.destination-card');
-        
-        if (logo && destinationCard) {
-          const logoRect = logo.getBoundingClientRect();
-          const logoBottom = logoRect.bottom;
-          const newTop = logoBottom + 5; // 5px abaixo do logo
-          destinationCard.style.top = newTop + 'px';
-        }
-      }
-    }
-
-    // Executar após carregamento e resize
-    window.addEventListener('load', adjustDestinationCardPosition);
-    window.addEventListener('resize', adjustDestinationCardPosition);
   </script>
 </head>
 
