@@ -226,11 +226,11 @@
     /* --- PROGRESS BAR (Desktop) --- */
     .progress-bar-container {
       position: fixed;
-      bottom: 2vh;
+      bottom: 5vh;
       left: 25vw; 
       transform: translateX(-50%);
       width: clamp(200px, 30vw, 500px);
-      z-index: 999;
+      z-index: 1000;
       pointer-events: none;
     }
 
@@ -266,22 +266,18 @@
       .top-left-logo, .top-right-logo { width: 60px; top: 10px; }
       
       .destination-card {
-        top: 75px; left: 50%; transform: translateX(-50%);
+        top: 80px; left: 50%; transform: translateX(-50%);
         width: 90%; max-width: none;
       }
 
       .grid-container {
-        top: auto; bottom: 40px; right: 10px; left: 10px;
+        top: auto; bottom: 20px; right: 10px; left: 10px;
         width: auto;
         grid-template-columns: repeat(3, 1fr);
         grid-template-rows: auto;
         height: auto;
         gap: 8px;
         overflow-y: visible; 
-      }
-      
-      .grid-item {
-        min-height: 120px;
       }
       
       /* --- CORREÇÃO DO LAYOUT MOBILE --- */
@@ -300,13 +296,12 @@
       }
       
       .progress-bar-container {
-        position: fixed !important;
-        bottom: 2px !important;
-        left: 10px !important;
-        right: 10px !important;
+        position: relative !important;
+        bottom: auto;
+        left: auto;
         transform: none;
-        width: auto !important;
-        margin-top: 0;
+        width: 100% !important;
+        margin-top: 15px;
         grid-column: 1 / -1; 
         pointer-events: auto;
       }
