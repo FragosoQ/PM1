@@ -316,6 +316,25 @@
     setTimeout(() => {
       location.reload();
     }, 7200000);
+
+    // Ajustar dinamicamente a posição do destination-card no mobile
+    function adjustDestinationCardPosition() {
+      if (window.innerWidth <= 768) {
+        const logo = document.getElementById('main-logo');
+        const destinationCard = document.querySelector('.destination-card');
+        
+        if (logo && destinationCard) {
+          const logoRect = logo.getBoundingClientRect();
+          const logoBottom = logoRect.bottom;
+          const newTop = logoBottom + 5; // 5px abaixo do logo
+          destinationCard.style.top = newTop + 'px';
+        }
+      }
+    }
+
+    // Executar após carregamento e resize
+    window.addEventListener('load', adjustDestinationCardPosition);
+    window.addEventListener('resize', adjustDestinationCardPosition);
   </script>
 </head>
 
