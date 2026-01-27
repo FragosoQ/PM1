@@ -261,7 +261,7 @@ const updateEvoProgress = async () => {
  */
 const fetchInfoPanelData = async () => {
     const row = chartConfig.posto + 1; // posto 1 = row 2, posto 2 = row 3, etc.
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${chartConfig.sheetName}&range=A${row}:AK${row}`;
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${chartConfig.sheetName}&range=A${row}:AN${row}`;
 
     try {
         const response = await d3.text(SHEET_URL);
@@ -276,12 +276,61 @@ const fetchInfoPanelData = async () => {
             i: values[8] || '',      // Column I is index 8
             x: values[23] || '',     // Column X is index 23
             o: values[14] || '',     // Column O is index 14
-            status: values[34] || '' // Column AI is index 34 (STATUS)
+            status: values[34] || '', // Column AI is index 34 (STATUS)
+            diasPrazo: parseFloat(values[37]) || 0,      // Column AL is index 37 (Dias Prazo)
+            diasUsados: parseFloat(values[38]) || 0,     // Column AM is index 38 (Dias Usados)
+            diasDisponiveis: parseFloat(values[39]) || 0 // Column AN is index 39 (Dias Disponíveis)
         };
 
     } catch (error) {
         console.error('Error fetching info panel data:', error);
-        return { lote: '', e: '', i: '', x: '', o: '', status: '' };
+        return { lote: '', e: '', i: '', x: '', o: '', status: '', diasPrazo: 0, diasUsados: 0, diasDisponiveis: 0 };
+    }
+};
+
+/**
+ * Updates GOAL chart with data from PM1
+ */
+const updateGoalChart = (diasPrazo, diasUsados, diasDisponiveis) => {
+    // Determine color for middle ring (amarelo se AM > AL)
+    const middleColor = diasUsados > diasPrazo ? '#FFD700' : '#00a2e8';
+    
+    // Determine color for inner ring (vermelho se AN = 0)
+    const innerColor = diasDisponiveis === 0 ? '#FF0000' : '#80a5dc';
+    
+    // Maximum value for all rings is diasPrazo + 4
+    const maxValue = diasPrazo + 4;
+    
+    // Calculate dash arrays for each circle (full circle = 2 * PI * r)
+    // Outer ring: r=80, circumference = 502.65
+    const outerCircumference = 2 * Math.PI * 80;
+    const outerDashArray = maxValue > 0 ? `${(diasPrazo / maxValue) * outerCircumference} ${outerCircumference}` : '0 502.65';
+    
+    // Middle ring: r=60, circumference = 376.99
+    const middleCircumference = 2 * Math.PI * 60;
+    const middleDashArray = maxValue > 0 ? `${(diasUsados / maxValue) * middleCircumference} ${middleCircumference}` : '0 376.99';
+    
+    // Inner ring: r=42, circumference = 263.89
+    const innerCircumference = 2 * Math.PI * 42;
+    const innerDashArray = maxValue > 0 ? `${(diasDisponiveis / maxValue) * innerCircumference} ${innerCircumference}` : '0 263.89';
+    
+    // Update SVG circles
+    const svg = document.querySelector('.goal-chart');
+    if (svg) {
+        const circles = svg.querySelectorAll('circle[stroke-dasharray]');
+        if (circles.length >= 3) {
+            // Outer circle (AL - Dias Prazo) - always full
+            circles[0].setAttribute('stroke-dasharray', outerDashArray);
+            circles[0].setAttribute('stroke', '#007bff');
+            
+            // Middle circle (AM - Dias Usados)
+            circles[1].setAttribute('stroke-dasharray', middleDashArray);
+            circles[1].setAttribute('stroke', middleColor);
+            
+            // Inner circle (AN - Dias Disponíveis)
+            circles[2].setAttribute('stroke-dasharray', innerDashArray);
+            circles[2].setAttribute('stroke', innerColor);
+        }
     }
 };
 
@@ -324,6 +373,9 @@ const updateInfoPanel = async () => {
             statusIndicator.alt = 'Status OFF';
         }
     }
+    
+    // Update GOAL chart
+    updateGoalChart(data.diasPrazo, data.diasUsados, data.diasDisponiveis);
     
     console.log('Info panel updated with:', data);
 };
