@@ -261,7 +261,7 @@ const updateEvoProgress = async () => {
  */
 const fetchInfoPanelData = async () => {
     const row = chartConfig.posto + 1; // posto 1 = row 2, posto 2 = row 3, etc.
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${chartConfig.sheetName}&range=A${row}:AI${row}`;
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${chartConfig.sheetName}&range=A${row}:AK${row}`;
 
     try {
         const response = await d3.text(SHEET_URL);
@@ -271,17 +271,17 @@ const fetchInfoPanelData = async () => {
         const values = response.split('\n')[0]?.split(',').map(v => v.replace(/^"|"$/g, '').trim()) || [];
         
         return {
-            ah: values[33] || '', // Column AH is index 33
-            e: values[4] || '',   // Column E is index 4
-            i: values[8] || '',   // Column I is index 8
-            x: values[23] || '',  // Column X is index 23
-            o: values[14] || '',  // Column O is index 14
-            status: values[34] || ''  // Column AI is index 34 (STATUS)
+            lote: values[36] || '',  // Column AK is index 36 (Lote)
+            e: values[4] || '',      // Column E is index 4
+            i: values[8] || '',      // Column I is index 8
+            x: values[23] || '',     // Column X is index 23
+            o: values[14] || '',     // Column O is index 14
+            status: values[34] || '' // Column AI is index 34 (STATUS)
         };
 
     } catch (error) {
         console.error('Error fetching info panel data:', error);
-        return { ah: '', e: '', i: '', x: '', o: '', status: '' };
+        return { lote: '', e: '', i: '', x: '', o: '', status: '' };
     }
 };
 
@@ -299,11 +299,11 @@ const updateInfoPanel = async () => {
         `;
     }
     
-    // Update second card with AH, E, I, X, O
+    // Update second card with Lote, E, I, X, O
     const infoPanelCard2 = document.querySelector('.info-panel-content-2');
     if (infoPanelCard2) {
         infoPanelCard2.innerHTML = `
-            <div class="info-line">${data.ah}</div>
+            <div class="info-line">${data.lote}</div>
             <div class="info-line">${data.e}</div>
             <div class="info-line">${data.i}</div>
             <div class="info-line">${data.x}</div>
