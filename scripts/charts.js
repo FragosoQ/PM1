@@ -8,22 +8,25 @@ const chartConfig = {
         chart5: '#5bc0de',
         chart6: '#3a94ff'
     },
-    spreadsheetId: '1quphFwoVMjelWgxaF9jQi2qrAlHBir4Kc0LRUZRtaoY',
-    sheets: {
-        chart1: 'CUBA',
-        chart2: 'INTERIORES',
-        chart3: 'TESTES',
-        chart4: 'ENVOLVENTES',
-        chart5: 'ESTRUTURA',
-        chart6: 'ÁREA TÉCNICA'
+    spreadsheetId: '1GQUB52a2gKR429bjqJrNkbP5rjR7Z_4v85z9M7_Cr8Y',
+    sheetName: 'PM1',
+    posto: 1, // Posto number (line to read: posto 1 = line 2, posto 2 = line 3, etc.)
+    columns: {
+        chart1: 'AA', // CUBA
+        chart2: 'AC', // INTERIOR
+        chart3: 'AF', // TESTES
+        chart4: 'AD', // ENVOLVENTES
+        chart5: 'AB', // ESTRUTURA
+        chart6: 'AE'  // ÁREA TÉCNICA
     }
 };
 
 /**
- * Fetches percentage value from Google Sheets
+ * Fetches percentage value from Google Sheets PM1
  */
-const fetchPercentage = async (sheetName) => {
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}&range=A2`;
+const fetchPercentage = async (columnName) => {
+    const row = chartConfig.posto + 1; // posto 1 = row 2, posto 2 = row 3, etc.
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${chartConfig.sheetName}&range=${columnName}${row}`;
 
     try {
         const response = await d3.text(SHEET_URL);
@@ -35,7 +38,7 @@ const fetchPercentage = async (sheetName) => {
         }
 
         if (!rawValue) {
-            console.warn(`Empty data or unexpected format for ${sheetName}.`);
+            console.warn(`Empty data or unexpected format for column ${columnName}.`);
             return 0;
         }
 
@@ -51,26 +54,27 @@ const fetchPercentage = async (sheetName) => {
             }
         }
         
-        console.warn(`Non-numeric value found in ${sheetName}: "${rawValue}". Using 0% as fallback.`);
+        console.warn(`Non-numeric value found in column ${columnName}: "${rawValue}". Using 0% as fallback.`);
         return 0;
 
     } catch (error) {
-        console.error(`Error fetching data from sheet ${sheetName}:`, error);
+        console.error(`Error fetching data from column ${columnName}:`, error);
         return 0; 
     }
 };
 
 /**
- * Fetches destination name from Google Sheets
+ * Fetches destination name from Google Sheets PM1 (Column L - PAÍS)
  */
 const fetchDestination = async () => {
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=DESTINO&range=A2`;
+    const row = chartConfig.posto + 1; // posto 1 = row 2, posto 2 = row 3, etc.
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${chartConfig.sheetName}&range=L${row}`;
 
     try {
         const response = await d3.text(SHEET_URL);
-        console.log('DESTINO response:', response);
+        console.log('PAÍS response:', response);
         
-        // Split by newlines and get first line (which is A2 data)
+        // Split by newlines and get first line (which is L2 data)
         let destination = response.split('\n')[0]?.trim(); 
 
         if (!destination) {
@@ -215,16 +219,16 @@ const drawDonutChart = (containerId, percentage, fillColor) => {
  */
 const updateAllCharts = async () => {
     const charts = [
-        { id: '#grid-item-1', sheet: chartConfig.sheets.chart1, color: chartConfig.colors.chart1 },
-        { id: '#grid-item-2', sheet: chartConfig.sheets.chart2, color: chartConfig.colors.chart2 },
-        { id: '#grid-item-3', sheet: chartConfig.sheets.chart3, color: chartConfig.colors.chart3 },
-        { id: '#grid-item-4', sheet: chartConfig.sheets.chart4, color: chartConfig.colors.chart4 },
-        { id: '#grid-item-5', sheet: chartConfig.sheets.chart5, color: chartConfig.colors.chart5 },
-        { id: '#grid-item-6', sheet: chartConfig.sheets.chart6, color: chartConfig.colors.chart6 }
+        { id: '#grid-item-1', column: chartConfig.columns.chart1, color: chartConfig.colors.chart1 },
+        { id: '#grid-item-2', column: chartConfig.columns.chart2, color: chartConfig.colors.chart2 },
+        { id: '#grid-item-3', column: chartConfig.columns.chart3, color: chartConfig.colors.chart3 },
+        { id: '#grid-item-4', column: chartConfig.columns.chart4, color: chartConfig.colors.chart4 },
+        { id: '#grid-item-5', column: chartConfig.columns.chart5, color: chartConfig.colors.chart5 },
+        { id: '#grid-item-6', column: chartConfig.columns.chart6, color: chartConfig.colors.chart6 }
     ];
 
     for (const chart of charts) {
-        const percentage = await fetchPercentage(chart.sheet);
+        const percentage = await fetchPercentage(chart.column);
         drawDonutChart(chart.id, percentage, chart.color);
     }
 };
@@ -253,14 +257,15 @@ const updateEvoProgress = async () => {
 };
 
 /**
- * Fetches info panel data from Google Sheets (Modelo sheet)
+ * Fetches info panel data from Google Sheets PM1
  */
 const fetchInfoPanelData = async () => {
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=Modelo&range=A2:J2`;
+    const row = chartConfig.posto + 1; // posto 1 = row 2, posto 2 = row 3, etc.
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${chartConfig.sheetName}&range=A${row}:AI${row}`;
 
     try {
         const response = await d3.text(SHEET_URL);
-        console.log('Modelo response:', response);
+        console.log('PM1 info panel response:', response);
         
         // Parse CSV response
         const values = response.split('\n')[0]?.split(',').map(v => v.replace(/^"|"$/g, '').trim()) || [];
@@ -271,12 +276,12 @@ const fetchInfoPanelData = async () => {
             c2: values[2] || '',
             g2: values[6] || '', // Column G is index 6
             i2: values[8] || '', // Column I is index 8
-            j2: values[9] || ''  // Column J is index 9
+            status: values[34] || ''  // Column AI is index 34 (STATUS)
         };
 
     } catch (error) {
         console.error('Error fetching info panel data:', error);
-        return { a2: '', b2: '', c2: '', g2: '', i2: '', j2: '' };
+        return { a2: '', b2: '', c2: '', g2: '', i2: '', status: '' };
     }
 };
 
@@ -286,11 +291,11 @@ const fetchInfoPanelData = async () => {
 const updateInfoPanel = async () => {
     const data = await fetchInfoPanelData();
     
-    // Update first card with A2
+    // Update first card with posto number
     const infoPanelCard1 = document.querySelector('.info-panel-content-1');
     if (infoPanelCard1) {
         infoPanelCard1.innerHTML = `
-            <div class="info-line">${data.a2}</div>
+            <div class="info-line">${chartConfig.posto}</div>
         `;
     }
     
@@ -305,10 +310,10 @@ const updateInfoPanel = async () => {
         `;
     }
     
-    // Update status indicator based on J2
+    // Update status indicator based on AI column (STATUS)
     const statusIndicator = document.getElementById('status-indicator');
     if (statusIndicator) {
-        const status = data.j2.toUpperCase();
+        const status = data.status.toUpperCase();
         
         if (status === 'ON') {
             statusIndicator.src = 'https://static.wixstatic.com/media/a6967f_e69c4b86d193485596b9d3d2d49625c3~mv2.png';
