@@ -19,7 +19,7 @@ const config = {
 		globeDotColor: '#05d5fa',
 		globeMarkerColor: 'rgb(143, 216, 216)',
 		globeMarkerGlow: 'rgb(255, 255, 255)',
-		globeLines: 'rgb(255, 255, 255)',
+		globeLines: '#00a2e8',
 		globeLinesDots: '#00a2e8'
 	},
 	display: {

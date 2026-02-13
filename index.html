@@ -134,6 +134,7 @@
       align-items: center;
       justify-content: center;
       padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
     }
 
     .info-panel-content-1 .info-line {
@@ -366,7 +367,11 @@
     }
 
     @media (max-width: 768px) {
-      .top-left-logo, .top-right-logo { width: 60px; top: 10px; }
+      .top-left-logo, .top-right-logo { 
+        width: calc(50% - 10px); 
+        max-width: 150px;
+        top: 5px; 
+      }
       
       .destination-card {
         top: 75px; left: 50%; transform: translateX(-50%);
@@ -376,8 +381,8 @@
       .grid-container {
         top: 135px; bottom: auto; right: 10px; left: 10px;
         width: auto;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: auto;
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: repeat(10, minmax(100px, auto)) !important;
         height: auto;
         gap: 8px;
         overflow-y: visible; 
@@ -448,6 +453,7 @@
       <div class="card-title"></div>
       <div class="info-panel-content-1"></div>
     </div>
+    <img src="https://static.wixstatic.com/media/a6967f_95adc546d37c48439468dc428cc46bf3~mv2.png" alt="Card Image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px; grid-column: span 1; grid-row: span 1;" />
     <div class="grid-item" id="grid-item-1">
       <div class="card-title">CUBA</div>
       <div class="card-chart"></div>
@@ -460,13 +466,12 @@
       <div class="card-title">ESTRUTURA</div>
       <div class="card-chart"></div>
     </div>
-    <img src="https://static.wixstatic.com/media/a6967f_95adc546d37c48439468dc428cc46bf3~mv2.png" alt="Card Image" style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px; grid-column: span 1; grid-row: span 1;" />
     <div class="grid-item" id="grid-item-4">
       <div class="card-title">ENVOLVENTE</div>
       <div class="card-chart"></div>
     </div>
     <div class="grid-item" id="grid-item-3">
-      <div class="card-title">ÁREA TÉCNICA TESTES</div>
+      <div class="card-title">ÁREA TÉCNICA</div>
       <div class="card-chart"></div>
     </div>
     <div class="grid-item" id="grid-item-6">
