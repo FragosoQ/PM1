@@ -257,6 +257,50 @@ const updateEvoProgress = async () => {
 };
 
 /**
+ * Fetches data from column A (A2:A6) of WIP_MONTAGEM sheet
+ */
+const fetchMontagemOData = async () => {
+    // URL encode the sheet name with special characters
+    const sheetNameEncoded = encodeURIComponent("'WIP_MONTAGEM'!A2:A6");
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&range=${sheetNameEncoded}`;
+
+    try {
+        const response = await d3.text(SHEET_URL);
+        console.log('WIP_MONTAGEM data response:', response);
+        
+        // Parse CSV response and get lines 1-5
+        const lines = response.split('\n').filter(line => line.trim() !== '');
+        const data = lines.slice(0, 5).map(line => line.replace(/^"|"$/g, '').trim());
+        
+        return data;
+
+    } catch (error) {
+        console.error('Error fetching WIP_MONTAGEM data:', error);
+        return ['', '', '', '', ''];
+    }
+};
+
+/**
+ * Fetches the active lote status from WIP_MONTAGEM column P (P2:P6)
+ */
+const fetchActiveLote = async () => {
+    const sheetNameEncoded = encodeURIComponent("'WIP_MONTAGEM'!P2:P6");
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&range=${sheetNameEncoded}`;
+
+    try {
+        const response = await d3.text(SHEET_URL);
+        const lines = response.split('\n').filter(line => line.trim() !== '');
+        const activeLotes = lines.slice(0, 5).map(line => line.replace(/^"|"$/g, '').trim());
+        
+        return activeLotes;
+
+    } catch (error) {
+        console.error('Error fetching active lote:', error);
+        return ['', '', '', '', ''];
+    }
+};
+
+/**
  * Fetches info panel data from Google Sheets PM1
  */
 const fetchInfoPanelData = async () => {
@@ -357,6 +401,26 @@ const updateInfoPanel = async () => {
             <div class="info-line">${data.i}</div>
             <div class="info-line">${data.e}</div>
         `;
+    }
+    
+    // Update third card (WIP_MONTAGEM) with data from WIP_MONTAGEM column A (A2:A6)
+    const montagemOData = await fetchMontagemOData();
+    const activeLoteData = await fetchActiveLote();
+    const montagemOCard = document.querySelector('.info-panel-content-montagem-o');
+    if (montagemOCard) {
+        let html = '';
+        for (let i = 0; i < 5; i++) {
+            const item = montagemOData[i] || '';
+            const isActive = activeLoteData[i]?.toLowerCase() === 'true' || activeLoteData[i]?.toLowerCase() === '1' || activeLoteData[i] === 'SIM';
+            let className = 'buffer-item';
+            if (isActive) {
+                className = 'buffer-item active';
+            } else if (item) {
+                className = 'buffer-item active-weak';
+            }
+            html += `<div class="${className}">${item}</div>`;
+        }
+        montagemOCard.innerHTML = html;
     }
     
     // Update status indicator based on AI column (STATUS)
