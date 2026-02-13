@@ -352,11 +352,10 @@ const updateInfoPanel = async () => {
     const infoPanelCard2 = document.querySelector('.info-panel-content-2');
     if (infoPanelCard2) {
         infoPanelCard2.innerHTML = `
-            <div class="info-line">${data.lote}</div>
-            <div class="info-line">${data.e}</div>
-            <div class="info-line">${data.i}</div>
-            <div class="info-line">${data.x}</div>
             <div class="info-line">${data.o}</div>
+            <div class="info-line">${data.x}</div>
+            <div class="info-line">${data.i}</div>
+            <div class="info-line">${data.e}</div>
         `;
     }
     
