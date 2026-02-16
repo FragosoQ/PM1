@@ -297,8 +297,8 @@ async function setup(app) {
   groups.main.add(globe);
 
   // Apply initial globe rotation (static, no animation)
-  groups.globe.rotation.x = THREE.Math.degToRad(-5);
-  groups.globe.rotation.y = THREE.Math.degToRad(-105);
+  groups.globe.rotation.x = THREE.Math.degToRad(0);
+  groups.globe.rotation.y = THREE.Math.degToRad(-90);
   groups.globe.rotation.z = THREE.Math.degToRad(0);
 
   const points = new Points(data.grid);
