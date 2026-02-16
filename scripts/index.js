@@ -297,7 +297,7 @@ async function setup(app) {
   groups.main.add(globe);
 
   // Apply initial globe rotation (static, no animation)
-  groups.globe.rotation.x = THREE.Math.degToRad(10);
+  groups.globe.rotation.x = THREE.Math.degToRad(20);
   groups.globe.rotation.y = THREE.Math.degToRad(-100);
   groups.globe.rotation.z = THREE.Math.degToRad(0);
 
