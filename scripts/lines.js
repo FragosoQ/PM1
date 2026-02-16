@@ -131,7 +131,10 @@ class Line {
     return new MeshLineMaterial({
       color: config.colors.globeLines,
       transparent: true,
-      opacity: 0.45
+      opacity: 0.8,
+      lineWidth: 2.25,
+      blending: THREE.AdditiveBlending,
+      depthTest: false
     });
   }
 }
