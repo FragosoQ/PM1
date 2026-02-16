@@ -4,7 +4,7 @@ const config = {
 		pointTexture: './assets/imgs/disc.png'
 	},
 	sizes: {
-		globe: 150,
+		globe: 130,
 		globeDotSize: 2
 	},
 	scale: {
