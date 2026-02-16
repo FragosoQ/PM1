@@ -132,7 +132,7 @@ class Line {
       color: config.colors.globeLines,
       transparent: true,
       opacity: 0.8,
-      lineWidth: 2.25,
+      lineWidth: 1.6,
       blending: THREE.AdditiveBlending,
       depthTest: false
     });

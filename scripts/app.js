@@ -122,7 +122,7 @@ class App {
     if (width > 900) {
         // width * 0.25 move o centro cerca de 25% para a esquerda.
         // Podes aumentar para 0.3 ou diminuir para 0.15 para ajustar a margem.
-        const offset = width * 0.25; 
+        const offset = width * 0.24; 
         this.camera.setViewOffset(width, height, offset, 0, width, height);
     } else {
         // Mobile: Reset total para o centro
