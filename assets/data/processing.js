@@ -112,7 +112,30 @@ const connections = {
 
 
 function getCountry(name, countries) {
-  return countries.find(c => c.name.toUpperCase() === name.toUpperCase());
+  // Função auxiliar para remover acentos
+  const removeAccents = (str) => {
+    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  };
+  
+  // Primeiro tenta encontrar pelo nome original (caso-insensível)
+  let found = countries.find(c => c.name.toUpperCase() === name.toUpperCase());
+  
+  // Se não encontrado, tenta usar o mapeamento de português
+  if (!found && typeof portugueseCountryNames !== 'undefined') {
+    const normalizedInput = removeAccents(name);
+    const englishName = portugueseCountryNames[normalizedInput];
+    if (englishName) {
+      found = countries.find(c => c.name.toUpperCase() === englishName.toUpperCase());
+    }
+  }
+  
+  // Se ainda não encontrado, tenta encontrar por correspondência parcial com acentos removidos
+  if (!found) {
+    const normalizedInput = removeAccents(name);
+    found = countries.find(c => removeAccents(c.name) === normalizedInput);
+  }
+  
+  return found;
 }
 
 function getCountries(object, countries) {

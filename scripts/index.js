@@ -85,7 +85,10 @@ async function preload() {
     
     // Fetch destination before connections.js loads
     if (typeof fetchDestination === 'function') {
-      window.currentDestination = await fetchDestination();
+      const fetchedDestination = await fetchDestination();
+      // Use getCountry to support Portuguese names
+      const countryObj = getCountry(fetchedDestination, data.countries);
+      window.currentDestination = countryObj ? countryObj.name : 'Nigeria';
       console.log('✓ Preloaded destination:', window.currentDestination);
     } else {
       console.warn('⚠ fetchDestination not available, using default');
@@ -106,17 +109,17 @@ async function setup(app) {
   // Fetch destination FIRST
   console.log('=== SETUP: Fetching destination ===');
   if (typeof fetchDestination === 'function') {
-    window.currentDestination = await fetchDestination();
-    console.log('✓ Destination fetched:', window.currentDestination);
+    const fetchedDestination = await fetchDestination();
+    console.log('✓ Destination fetched (raw):', fetchedDestination);
     
-    // Validate that destination exists in countries data
-    const destinationExists = data.countries && data.countries.some(country => 
-      country.name.toLowerCase() === window.currentDestination.toLowerCase()
-    );
+    // Use getCountry to support Portuguese names and resolve to English name
+    const countryObj = getCountry(fetchedDestination, data.countries);
     
-    if (!destinationExists) {
-      console.warn('⚠ Destination "' + window.currentDestination + '" not found in countries data. Using Nigeria as fallback.');
-      console.log('Available countries:', data.countries.map(c => c.name).join(', '));
+    if (countryObj) {
+      window.currentDestination = countryObj.name;
+      console.log('✓ Destination resolved to:', window.currentDestination);
+    } else {
+      console.warn('⚠ Destination "' + fetchedDestination + '" not found. Using Nigeria as fallback.');
       window.currentDestination = 'Nigeria';
     }
     
