@@ -18,7 +18,13 @@ const chartConfig = {
         chart4: 'AD', // ENVOLVENTES
         chart5: 'AB', // ESTRUTURA
         chart6: 'AE'  // ÁREA TÉCNICA
-    }
+    },
+    refreshIntervalMs: 30000
+};
+
+const chartRuntimeState = {
+    lastPercentages: null,
+    isUpdating: false
 };
 
 /**
@@ -217,8 +223,8 @@ const drawDonutChart = (containerId, percentage, fillColor) => {
 /**
  * Updates all charts with data from Google Sheets
  */
-const updateAllCharts = async () => {
-    const charts = [
+const getChartsConfig = () => {
+    return [
         { id: '#grid-item-1', column: chartConfig.columns.chart1, color: chartConfig.colors.chart1 },
         { id: '#grid-item-2', column: chartConfig.columns.chart2, color: chartConfig.colors.chart2 },
         { id: '#grid-item-3', column: chartConfig.columns.chart3, color: chartConfig.colors.chart3 },
@@ -226,10 +232,46 @@ const updateAllCharts = async () => {
         { id: '#grid-item-5', column: chartConfig.columns.chart5, color: chartConfig.colors.chart5 },
         { id: '#grid-item-6', column: chartConfig.columns.chart6, color: chartConfig.colors.chart6 }
     ];
+};
 
-    for (const chart of charts) {
-        const percentage = await fetchPercentage(chart.column);
-        drawDonutChart(chart.id, percentage, chart.color);
+const hasChartDataChanged = (currentValues, previousValues) => {
+    if (!previousValues || currentValues.length !== previousValues.length) {
+        return true;
+    }
+
+    return currentValues.some((value, index) => value !== previousValues[index]);
+};
+
+const redrawChartsWithPercentages = (percentages) => {
+    const charts = getChartsConfig();
+    charts.forEach((chart, index) => {
+        drawDonutChart(chart.id, percentages[index], chart.color);
+    });
+};
+
+const fetchAllChartPercentages = async () => {
+    const charts = getChartsConfig();
+    return Promise.all(charts.map(chart => fetchPercentage(chart.column)));
+};
+
+const updateAllCharts = async (forceRedraw = false) => {
+    if (chartRuntimeState.isUpdating) {
+        return;
+    }
+
+    chartRuntimeState.isUpdating = true;
+
+    try {
+        const currentPercentages = await fetchAllChartPercentages();
+        const changed = hasChartDataChanged(currentPercentages, chartRuntimeState.lastPercentages);
+
+        if (forceRedraw || changed) {
+            redrawChartsWithPercentages(currentPercentages);
+            chartRuntimeState.lastPercentages = [...currentPercentages];
+            console.log('Pie charts updated from Google Sheets');
+        }
+    } finally {
+        chartRuntimeState.isUpdating = false;
     }
 };
 
@@ -237,11 +279,20 @@ const updateAllCharts = async () => {
  * Initializes charts on page load and window resize
  */
 const initCharts = () => {
-    updateAllCharts();
+    updateAllCharts(true);
     
     window.addEventListener('resize', () => {
-        updateAllCharts();
+        if (chartRuntimeState.lastPercentages) {
+            redrawChartsWithPercentages(chartRuntimeState.lastPercentages);
+            return;
+        }
+
+        updateAllCharts(true);
     });
+
+    setInterval(() => {
+        updateAllCharts();
+    }, chartConfig.refreshIntervalMs);
 };
 
 /**
