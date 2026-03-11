@@ -40,17 +40,22 @@ class Globe {
 
   createGlobeMaterial() {
     const textureLoader = new THREE.TextureLoader();
-    const texture = textureLoader.load(config.urls.globeTexture);
+    const texture = textureLoader.load(
+      config.urls.globeTexture,
+      undefined,
+      undefined,
+      (error) => {
+        console.warn('Globe texture failed to load, using fallback material.', error);
+      }
+    );
+
+    texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
 
     const shaderMaterial = new THREE.ShaderMaterial({
       uniforms: {texture: { value:  texture }},
       vertexShader: shaders.globe.vertexShader,
       fragmentShader: shaders.globe.fragmentShader,
-      blending: THREE.AdditiveBlending,
-      transparent: true,
-    })
-
-    const normalMaterial = new THREE.MeshBasicMaterial({
       blending: THREE.AdditiveBlending,
       transparent: true,
     })

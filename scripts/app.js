@@ -31,7 +31,11 @@ class App {
 
   // --- ALTERAÇÃO 2: Limpeza do CSS ---
   initRenderer = () => {
-    this.renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+    this.renderer = new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: true,
+      powerPreference: 'high-performance'
+    });
     this.renderer.setClearColor(0x000000, 0.0);
     
     // REMOVIDO: left='500px' e transform. Isso estragava o mobile.
@@ -43,9 +47,9 @@ class App {
     this.renderer.domElement.style.height = '100%';
     
     // Ajuste de performance para mobile (evita aquecimento)
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     
-    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.enabled = false;
   }
 
   initCamera = () => {

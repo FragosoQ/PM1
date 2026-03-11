@@ -335,6 +335,9 @@ const ROTATION_DURATION = 5000; // 5 segundos para completar a volta
 const PULSE_DURATION = 2000; // 2 segundos para completar a pulsação
 const WAVE_DURATION = 3000; // 3 segundos para completar a ondulação
 const GLOW_DURATION = 4000; // 4 segundos para completar a transição de cor
+const pointWaveOriginalColor = new THREE.Color();
+const pointWaveTargetColor = new THREE.Color(0xffffff);
+const pointWaveCurrentColor = new THREE.Color();
 
 /**
  * Configura efeitos aleatórios (rotação ou pulsação) a cada 25 segundos
@@ -435,9 +438,11 @@ function startGlobeGlow() {
 
 
 function animate(app) {
+  const now = Date.now();
+
   // Lógica de rotação periódica
   if (isRotating) {
-    const elapsed = Date.now() - rotationStartTime;
+    const elapsed = now - rotationStartTime;
     const progress = Math.min(elapsed / ROTATION_DURATION, 1);
     
     // Rotação completa de 360 graus (2 * PI radianos)
@@ -454,7 +459,7 @@ function animate(app) {
 
   // Lógica de pulsação dos pontos (simulando batimento cardíaco)
   if (isPulsing && groups.points) {
-    const elapsed = Date.now() - pulseStartTime;
+    const elapsed = now - pulseStartTime;
     const progress = Math.min(elapsed / PULSE_DURATION, 1);
     
     // Simula batimento cardíaco duplicado: duas sequências de batimento
@@ -491,7 +496,7 @@ function animate(app) {
 
   // Lógica de transição de cor dos pontos (azul -> branco -> azul)
   if (isWaving && elements.globePoints) {
-    const elapsed = Date.now() - waveStartTime;
+    const elapsed = now - waveStartTime;
     const progress = Math.min(elapsed / WAVE_DURATION, 1);
     
     // Função de easing suave (sin wave) para transição ida e volta
@@ -499,14 +504,11 @@ function animate(app) {
     const colorProgress = Math.sin(progress * Math.PI);
     
     // Cor original (azul) e cor de destino (branco)
-    const originalColor = new THREE.Color(config.colors.globeDotColor);
-    const targetColor = new THREE.Color(0xffffff); // Branco
-    
-    // Interpola entre as cores
-    const currentColor = originalColor.clone().lerp(targetColor, colorProgress);
+    pointWaveOriginalColor.set(config.colors.globeDotColor);
+    pointWaveCurrentColor.copy(pointWaveOriginalColor).lerp(pointWaveTargetColor, colorProgress);
     
     // Aplica a cor interpolada
-    elements.globePoints.material.color.set(currentColor);
+    elements.globePoints.material.color.copy(pointWaveCurrentColor);
     
     // Para quando completar a transição
     if (progress >= 1) {
@@ -519,7 +521,7 @@ function animate(app) {
 
   // Lógica de transição de cor do globo (glow)
   if (isGlowing && elements.globe) {
-    const elapsed = Date.now() - glowStartTime;
+    const elapsed = now - glowStartTime;
     const progress = Math.min(elapsed / GLOW_DURATION, 1);
     
     // Função de easing suave (sin wave) para transição ida e volta
@@ -559,16 +561,26 @@ function animate(app) {
     }
 
     if(elements.lines) {
+      const pulseSpeed = 0.002;
+      const minOpacity = 0.3;
+      const maxOpacity = 0.8;
+      const pulse = (Math.sin(now * pulseSpeed) + 1) / 2;
+
       for(let i = 0; i < elements.lines.length; i++) {
         const line = elements.lines[i];
         line.material.color.set(config.colors.globeLines);
-        
-        // Add pulsing effect to the line
-        const pulseSpeed = 0.002;
-        const minOpacity = 0.3;
-        const maxOpacity = 0.8;
-        const opacity = minOpacity + (Math.sin(Date.now() * pulseSpeed) + 1) / 2 * (maxOpacity - minOpacity);
-        line.material.opacity = opacity;
+
+        line.material.opacity = minOpacity + pulse * (maxOpacity - minOpacity);
+      }
+    }
+
+    if(elements.markers) {
+      for(let i = 0; i < elements.markers.length; i++) {
+        const marker = elements.markers[i];
+        marker.point.material.color.set(config.colors.globeMarkerColor);
+        if(marker.glow) {
+          marker.glow.material.color.set(config.colors.globeMarkerGlow);
+        }
       }
     }
 
@@ -590,13 +602,9 @@ function animate(app) {
     controls.changed = false
   }
 
-
-
   if(elements.lineDots) {
     for(let i = 0; i < elements.lineDots.length; i++) {
       const dot = elements.lineDots[i];
-      // Don't apply color to sprites - they use texture images
-      // Sprites don't have material.color property in the same way
       dot.animate();
     }
   }
@@ -604,15 +612,9 @@ function animate(app) {
   if(elements.markers) {
     for(let i = 0; i < elements.markers.length; i++) {
       const marker = elements.markers[i];
-      marker.point.material.color.set(config.colors.globeMarkerColor);
-      if(marker.glow) {
-        marker.glow.material.color.set(config.colors.globeMarkerGlow);
-      }
-      if(marker.label) {
+      if(marker.label && marker.label.material && marker.label.material.map) {
         marker.label.material.map.needsUpdate = true;
       }
-      // Ripple animation disabled
-      // marker.animateGlow();
     }
   }
 

@@ -24,7 +24,12 @@ const chartConfig = {
 
 const chartRuntimeState = {
     lastPercentages: null,
-    isUpdating: false
+    isUpdating: false,
+    destinationCache: {
+        value: null,
+        expiresAt: 0,
+        pendingPromise: null
+    }
 };
 
 /**
@@ -73,31 +78,47 @@ const fetchPercentage = async (columnName) => {
  * Fetches destination name from Google Sheets PM1 (Column L - PAÍS)
  */
 const fetchDestination = async () => {
+    const now = Date.now();
+    if (chartRuntimeState.destinationCache.value && chartRuntimeState.destinationCache.expiresAt > now) {
+        return chartRuntimeState.destinationCache.value;
+    }
+
+    if (chartRuntimeState.destinationCache.pendingPromise) {
+        return chartRuntimeState.destinationCache.pendingPromise;
+    }
+
     const row = chartConfig.posto + 1; // posto 1 = row 2, posto 2 = row 3, etc.
     const SHEET_URL = `https://docs.google.com/spreadsheets/d/${chartConfig.spreadsheetId}/gviz/tq?tqx=out:csv&sheet=${chartConfig.sheetName}&range=L${row}`;
 
-    try {
-        const response = await d3.text(SHEET_URL);
-        console.log('PAÍS response:', response);
-        
-        // Split by newlines and get first line (which is L2 data)
-        let destination = response.split('\n')[0]?.trim(); 
+    chartRuntimeState.destinationCache.pendingPromise = (async () => {
+        try {
+            const response = await d3.text(SHEET_URL);
+            console.log('PAÍS response:', response);
+            
+            let destination = response.split('\n')[0]?.trim();
 
-        if (!destination) {
-            console.warn('Empty destination data.');
+            if (!destination) {
+                console.warn('Empty destination data.');
+                destination = 'Nigeria';
+            }
+
+            destination = destination.replace(/^"|"$/g, '');
+
+            chartRuntimeState.destinationCache.value = destination;
+            chartRuntimeState.destinationCache.expiresAt = Date.now() + 30000;
+            console.log('Fetched destination:', destination);
+            return destination;
+        } catch (error) {
+            console.error('Error fetching destination:', error);
+            chartRuntimeState.destinationCache.value = 'Nigeria';
+            chartRuntimeState.destinationCache.expiresAt = Date.now() + 10000;
             return 'Nigeria';
+        } finally {
+            chartRuntimeState.destinationCache.pendingPromise = null;
         }
+    })();
 
-        // Remove quotes if present
-        destination = destination.replace(/^"|"$/g, ''); 
-        
-        console.log('Fetched destination:', destination);
-        return destination;
-
-    } catch (error) {
-        console.error('Error fetching destination:', error);
-        return 'Nigeria'; 
-    }
+    return chartRuntimeState.destinationCache.pendingPromise;
 };
 
 /**

@@ -42,6 +42,7 @@ class Marker {
     const text = this.createText();
     const texture = new THREE.Texture(text);
     texture.minFilter = THREE.LinearFilter;
+    texture.needsUpdate = true;
     textures.markerLabels.push(texture);
 
     const material = new THREE.SpriteMaterial()
