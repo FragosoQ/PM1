@@ -434,6 +434,15 @@ const updateGoalChart = (diasPrazo, diasUsados, folga) => {
  */
 const updateInfoPanel = async () => {
     const data = await fetchInfoPanelData();
+    const montagemOData = await fetchMontagemOData();
+
+    const normalizeLote = (value) => String(value || '').trim().toUpperCase();
+    const canonicalLote = (value) => normalizeLote(value).replace(/[^A-Z0-9]/g, '');
+
+    // Active lote comes from PM1 column O (LOTE)
+    const activeLote = data.o || '';
+    const normalizedActiveLote = normalizeLote(activeLote);
+    const canonicalActiveLote = canonicalLote(activeLote);
     
     // Update first card with posto number
     const infoPanelCard1 = document.querySelector('.info-panel-content-1');
@@ -446,23 +455,38 @@ const updateInfoPanel = async () => {
     // Update second card with Lote, E, I, X, O
     const infoPanelCard2 = document.querySelector('.info-panel-content-2');
     if (infoPanelCard2) {
+        const card2Values = [data.o, data.x, data.i, data.e];
+        const card2Html = card2Values.map((value) => {
+            const normalizedValue = normalizeLote(value);
+            const canonicalValue = canonicalLote(value);
+            const isMatchingActiveLote = canonicalActiveLote && canonicalValue && (
+                canonicalValue === canonicalActiveLote ||
+                canonicalValue.includes(canonicalActiveLote) ||
+                canonicalActiveLote.includes(canonicalValue) ||
+                normalizedValue.includes(normalizedActiveLote) ||
+                normalizedActiveLote.includes(normalizedValue)
+            );
+            const className = isMatchingActiveLote ? 'info-line info-line-active-lote' : 'info-line';
+            return `<div class="${className}">${value || ''}</div>`;
+        }).join('');
+
         infoPanelCard2.innerHTML = `
-            <div class="info-line">${data.o}</div>
-            <div class="info-line">${data.x}</div>
-            <div class="info-line">${data.i}</div>
-            <div class="info-line">${data.e}</div>
+            ${card2Html}
         `;
     }
     
     // Update third card (WIP_MONTAGEM) with data from WIP_MONTAGEM column A (A2:A6)
-    const montagemOData = await fetchMontagemOData();
-    const activeLoteData = await fetchActiveLote();
     const montagemOCard = document.querySelector('.info-panel-content-montagem-o');
     if (montagemOCard) {
         let html = '';
         for (let i = 0; i < 5; i++) {
             const item = montagemOData[i] || '';
-            const isActive = activeLoteData[i]?.toLowerCase() === 'true' || activeLoteData[i]?.toLowerCase() === '1' || activeLoteData[i] === 'SIM';
+            const canonicalItem = canonicalLote(item);
+            const isActive = canonicalActiveLote && canonicalItem && (
+                canonicalItem === canonicalActiveLote ||
+                canonicalItem.includes(canonicalActiveLote) ||
+                canonicalActiveLote.includes(canonicalItem)
+            );
             let className = 'buffer-item';
             if (isActive) {
                 className = 'buffer-item active';
