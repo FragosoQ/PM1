@@ -1,6 +1,6 @@
 const config = {
 	urls: {
-		globeTexture: './assets/textures/map_outline.png',
+		globeTexture: './assets/textures/earth_dark.jpg',
 		pointTexture: './assets/imgs/disc.png'
 	},
 	sizes: {

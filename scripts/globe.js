@@ -40,19 +40,28 @@ class Globe {
 
   createGlobeMaterial() {
     const textureLoader = new THREE.TextureLoader();
+    let shaderMaterial = null;
     const texture = textureLoader.load(
       config.urls.globeTexture,
       undefined,
       undefined,
       (error) => {
-        console.warn('Globe texture failed to load, using fallback material.', error);
+        console.warn('Globe texture failed to load, trying fallback texture.', error);
+        textureLoader.load('./assets/textures/map_outline.png', (fallbackTexture) => {
+          fallbackTexture.minFilter = THREE.LinearFilter;
+          fallbackTexture.magFilter = THREE.LinearFilter;
+          if (shaderMaterial && shaderMaterial.uniforms && shaderMaterial.uniforms.texture) {
+            shaderMaterial.uniforms.texture.value = fallbackTexture;
+            shaderMaterial.uniformsNeedUpdate = true;
+          }
+        });
       }
     );
 
     texture.minFilter = THREE.LinearFilter;
     texture.magFilter = THREE.LinearFilter;
 
-    const shaderMaterial = new THREE.ShaderMaterial({
+    shaderMaterial = new THREE.ShaderMaterial({
       uniforms: {texture: { value:  texture }},
       vertexShader: shaders.globe.vertexShader,
       fragmentShader: shaders.globe.fragmentShader,
