@@ -430,9 +430,6 @@ const updateGoalChart = (diasPrazo, diasUsados, folga) => {
     // Determine color for middle ring (amarelo se Dias Usados > Dias Prazo)
     const middleColor = diasUsados > diasPrazo ? '#FFD700' : '#00a2e8';
     
-    // Determine color for inner ring (vermelho se Folga = 0)
-    const innerColor = folga === 0 ? '#FF0000' : '#80a5dc';
-    
     // Maximum value for all rings is diasPrazo + 4
     const maxValue = diasPrazo + 4;
     
@@ -445,15 +442,11 @@ const updateGoalChart = (diasPrazo, diasUsados, folga) => {
     const middleCircumference = 2 * Math.PI * 60;
     const middleDashArray = maxValue > 0 ? `${(diasUsados / maxValue) * middleCircumference} ${middleCircumference}` : '0 376.99';
     
-    // Inner ring: r=42, circumference = 263.89
-    const innerCircumference = 2 * Math.PI * 42;
-    const innerDashArray = maxValue > 0 ? `${(folga / maxValue) * innerCircumference} ${innerCircumference}` : '0 263.89';
-    
     // Update SVG circles
     const svg = document.querySelector('.goal-chart');
     if (svg) {
         const circles = svg.querySelectorAll('circle[stroke-dasharray]');
-        if (circles.length >= 3) {
+        if (circles.length >= 2) {
             // Outer circle (AL - Dias Prazo) - always full
             circles[0].setAttribute('stroke-dasharray', outerDashArray);
             circles[0].setAttribute('stroke', '#007bff');
@@ -461,10 +454,6 @@ const updateGoalChart = (diasPrazo, diasUsados, folga) => {
             // Middle circle (AM - Dias Usados)
             circles[1].setAttribute('stroke-dasharray', middleDashArray);
             circles[1].setAttribute('stroke', middleColor);
-            
-            // Inner circle (AN - Folga)
-            circles[2].setAttribute('stroke-dasharray', innerDashArray);
-            circles[2].setAttribute('stroke', innerColor);
         }
     }
 };
