@@ -135,6 +135,18 @@ function getCountry(name, countries) {
     found = countries.find(c => removeAccents(c.name) === normalizedInput);
   }
   
+  // Se ainda não encontrado, tenta mapear país → capital
+  if (!found && typeof countryToCapital !== 'undefined') {
+    const normalizedInput = removeAccents(name);
+    const capitalName = countryToCapital[normalizedInput];
+    if (capitalName) {
+      found = countries.find(c => c.name.toUpperCase() === capitalName.toUpperCase());
+      if (!found) {
+        found = countries.find(c => removeAccents(c.name) === removeAccents(capitalName));
+      }
+    }
+  }
+  
   return found;
 }
 
