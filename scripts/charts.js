@@ -383,8 +383,27 @@ const fetchInfoPanelData = async () => {
         const response = await d3.text(SHEET_URL);
         console.log('PM1 info panel response:', response);
         
-        // Parse CSV response
-        const values = response.split('\n')[0]?.split(',').map(v => v.replace(/^"|"$/g, '').trim()) || [];
+        // Parse CSV response (RFC 4180 compliant - handles commas inside quoted fields)
+        const parseCSVLine = (line) => {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+                    else { inQuotes = !inQuotes; }
+                } else if (ch === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += ch;
+                }
+            }
+            result.push(current.trim());
+            return result;
+        };
+        const values = parseCSVLine(response.split('\n')[0] || '');
         
         return {
             lote: values[36] || '',  // Column AK is index 36 (Lote)
@@ -522,6 +541,7 @@ const updateInfoPanel = async () => {
     // Update status indicator based on AI column (STATUS)
     const statusIndicator = document.getElementById('status-indicator');
     if (statusIndicator) {
+        console.log('STATUS raw value:', JSON.stringify(data.status));
         const status = data.status.toUpperCase();
         
         if (status === 'ON') {
